@@ -56,7 +56,7 @@ export default async function HakkimdaPage() {
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       {/* Profil başlığı */}
-      <div className="flex items-start gap-6 mb-10">
+      <div className="flex flex-col sm:flex-row items-start gap-6 mb-10">
         {profile.foto && (
           <div className="w-28 h-28 rounded-2xl overflow-hidden flex-shrink-0 border border-gray-200">
             <Image
