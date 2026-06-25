@@ -40,6 +40,21 @@ export async function strapiGetAll<T>(
   return json.data ?? [];
 }
 
+export async function strapiPost<T>(
+  path: string,
+  data: Record<string, unknown>
+): Promise<T> {
+  const res = await fetch(`${STRAPI_URL}/api${path}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ data }),
+  });
+
+  if (!res.ok) throw new Error(`Strapi hata: ${res.status} — ${path}`);
+  const json = await res.json();
+  return json.data;
+}
+
 export async function strapiGetSingle<T>(
   path: string,
   params: Record<string, string | number> = {}

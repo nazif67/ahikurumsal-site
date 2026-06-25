@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "/pratik-bilgiler", label: "Pratik Bilgiler" },
   { href: "/araclar", label: "Araçlar" },
   { href: "/hakkimda", label: "Hakkımda" },
+  { href: "/iletisim", label: "İletişim" },
 ];
 
 export default function Header() {
