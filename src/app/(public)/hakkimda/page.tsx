@@ -91,7 +91,7 @@ export default async function HakkimdaPage() {
             )}
             {profile.linkedin && (
               <a
-                href={profile.linkedin}
+                href={profile.linkedin.startsWith("http") ? profile.linkedin : `https://${profile.linkedin}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-sm text-gray-600 hover:text-brand transition-colors"
