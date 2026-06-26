@@ -55,6 +55,26 @@ export async function strapiPost<T>(
   return json.data;
 }
 
+export async function strapiPut<T>(
+  path: string,
+  data: Record<string, unknown>
+): Promise<T> {
+  const token = process.env.STRAPI_API_TOKEN;
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (token) headers["Authorization"] = `Bearer ${token}`;
+
+  const res = await fetch(`${STRAPI_URL}/api${path}`, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({ data }),
+    cache: "no-store",
+  });
+
+  if (!res.ok) throw new Error(`Strapi hata: ${res.status} — ${path}`);
+  const json = await res.json();
+  return json.data;
+}
+
 export async function strapiGetSingle<T>(
   path: string,
   params: Record<string, string | number> = {}
