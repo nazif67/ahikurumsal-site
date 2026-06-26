@@ -2,7 +2,6 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { strapiGetAll } from "@/lib/strapi";
 import { renderMarkdown } from "@/lib/markdown";
-import ViewTracker from "@/components/ViewTracker";
 
 export const revalidate = 60;
 
@@ -13,7 +12,6 @@ type Blog = {
   content: string;
   date: string;
   category: string;
-  viewCount?: number;
 };
 
 export async function generateStaticParams() {
@@ -66,8 +64,6 @@ export default async function BlogPostPage({
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
-      <ViewTracker documentId={post.documentId} />
-
       <Link
         href="/blog"
         className="text-sm text-brand hover:underline inline-block mb-6"
@@ -80,15 +76,6 @@ export default async function BlogPostPage({
         {post.category && (
           <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
             {post.category}
-          </span>
-        )}
-        {post.viewCount != null && post.viewCount > 0 && (
-          <span className="flex items-center gap-1 text-xs text-gray-400 ml-auto">
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
-              <circle cx="12" cy="12" r="3" />
-            </svg>
-            {post.viewCount} okuma
           </span>
         )}
       </div>
