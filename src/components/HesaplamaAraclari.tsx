@@ -42,11 +42,10 @@ function ResultCard({
 }
 
 // ─── Kıdem Tazminatı ──────────────────────────────────────────────────────────
-function KidemCalc() {
+function KidemCalc({ tavan, tavanTarihi }: { tavan: number; tavanTarihi: string | null }) {
   const [brut, setBrut] = useState("");
   const [yil, setYil] = useState("");
   const [ay, setAy] = useState("0");
-  const [tavan, setTavan] = useState("47228.43");
   const [result, setResult] = useState<{
     sure: number;
     gunluk: number;
@@ -58,15 +57,14 @@ function KidemCalc() {
     const b = parseFloat(brut) || 0;
     const y = parseInt(yil) || 0;
     const a = parseInt(ay) || 0;
-    const t = parseFloat(tavan) || 0;
     if (!b || (!y && !a)) return;
     const sure = y + a / 12;
     const gunluk = b / 30;
-    const tavanAsildi = gunluk * 30 > t;
+    const tavanAsildi = gunluk * 30 > tavan;
     setResult({
       sure,
       gunluk,
-      tazminat: Math.min(gunluk * 30, t) * sure,
+      tazminat: Math.min(gunluk * 30, tavan) * sure,
       tavanAsildi,
     });
   }
@@ -76,8 +74,17 @@ function KidemCalc() {
       <p className="text-sm text-gray-500">
         Her tam çalışma yılı için 30 günlük brüt ücret ödenir (İş K. m.14).
       </p>
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-        <div className="col-span-2">
+
+      <div className="flex items-center gap-2 bg-blue-50 border border-blue-100 rounded-lg px-3 py-2 text-sm text-blue-800">
+        <span className="font-medium">Güncel kıdem tavanı:</span>
+        <span className="font-bold">{fmt(tavan)} TL/yıl</span>
+        {tavanTarihi && (
+          <span className="text-blue-500 text-xs ml-1">({tavanTarihi} itibarıyla)</span>
+        )}
+      </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <div className="col-span-2 sm:col-span-1">
           <label className="block text-xs font-medium text-gray-600 mb-1">
             Brüt Aylık Ücret (TL)
           </label>
@@ -116,18 +123,6 @@ function KidemCalc() {
             className={INPUT}
           />
         </div>
-        <div className="col-span-2">
-          <label className="block text-xs font-medium text-gray-600 mb-1">
-            Kıdem Tavanı (TL/yıl){" "}
-            <span className="text-gray-400 font-normal">— güncellenebilir</span>
-          </label>
-          <input
-            type="number"
-            value={tavan}
-            onChange={(e) => setTavan(e.target.value)}
-            className={INPUT}
-          />
-        </div>
       </div>
       <button onClick={hesapla} className={BTN}>
         Hesapla
@@ -152,8 +147,7 @@ function KidemCalc() {
           </div>
           {result.tavanAsildi && (
             <p className="text-xs text-amber-700 bg-amber-50 border border-amber-100 px-3 py-2 rounded-lg">
-              ⚠ Hesaplamada tavan uygulandı. Girilen tavan:{" "}
-              {fmt(parseFloat(tavan))} TL/yıl
+              ⚠ Hesaplamada tavan uygulandı: {fmt(tavan)} TL/yıl
             </p>
           )}
           <p className="text-xs text-gray-400">
@@ -501,42 +495,51 @@ function MaasZammiCalc() {
 }
 
 // ─── Tab wrapper ───────────────────────────────────────────────────────────────
-const TABS: { id: string; label: string; Comp: () => React.ReactElement }[] = [
-  { id: "kidem",      label: "Kıdem Tazminatı",  Comp: KidemCalc },
-  { id: "ihbar",      label: "İhbar Tazminatı",   Comp: IhbarCalc },
-  { id: "fazlaMesai", label: "Fazla Mesai",        Comp: FazlaMesaiCalc },
-  { id: "maasZammi",  label: "Maaş Zammı",         Comp: MaasZammiCalc },
-];
-
 import React from "react";
 
-export default function HesaplamaAraclari() {
+const TAB_IDS = ["kidem", "ihbar", "fazlaMesai", "maasZammi"] as const;
+const TAB_LABELS: Record<string, string> = {
+  kidem: "Kıdem Tazminatı",
+  ihbar: "İhbar Tazminatı",
+  fazlaMesai: "Fazla Mesai",
+  maasZammi: "Maaş Zammı",
+};
+
+export default function HesaplamaAraclari({
+  kidemTavani,
+  tavanTarihi,
+}: {
+  kidemTavani: number;
+  tavanTarihi: string | null;
+}) {
   const [activeTab, setActiveTab] = useState("kidem");
-  const active = TABS.find((t) => t.id === activeTab) ?? TABS[0];
 
   return (
     <div>
       <div className="flex flex-wrap gap-2 mb-6">
-        {TABS.map((tab) => (
+        {TAB_IDS.map((id) => (
           <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
+            key={id}
+            onClick={() => setActiveTab(id)}
             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
-              activeTab === tab.id
+              activeTab === id
                 ? "bg-blue-600 text-white shadow-sm"
                 : "bg-gray-100 text-gray-600 hover:bg-gray-200"
             }`}
           >
-            {tab.label}
+            {TAB_LABELS[id]}
           </button>
         ))}
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200 p-6">
         <h2 className="text-lg font-semibold text-gray-900 mb-5">
-          {active.label}
+          {TAB_LABELS[activeTab]}
         </h2>
-        <active.Comp />
+        {activeTab === "kidem" && <KidemCalc tavan={kidemTavani} tavanTarihi={tavanTarihi} />}
+        {activeTab === "ihbar" && <IhbarCalc />}
+        {activeTab === "fazlaMesai" && <FazlaMesaiCalc />}
+        {activeTab === "maasZammi" && <MaasZammiCalc />}
       </div>
     </div>
   );

@@ -1,8 +1,26 @@
 import HesaplamaAraclari from "@/components/HesaplamaAraclari";
+import { strapiGetSingle } from "@/lib/strapi";
 
+export const revalidate = 3600;
 export const metadata = { title: "Hesaplama Araçları" };
 
-export default function AraclarPage() {
+const VARSAYILAN_TAVAN = 47228.43;
+
+export default async function AraclarPage() {
+  let kidemTavani = VARSAYILAN_TAVAN;
+  let tavanTarihi: string | null = null;
+  try {
+    const data = await strapiGetSingle<{ tutar: number; gecerlilik_tarihi: string | null }>(
+      "/kidem-tavan"
+    );
+    if (data?.tutar) {
+      kidemTavani = data.tutar;
+      tavanTarihi = data.gecerlilik_tarihi ?? null;
+    }
+  } catch {
+    // Strapi'den çekilemezse varsayılan değer kullanılır
+  }
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
       <h1 className="text-3xl font-bold text-gray-900">Hesaplama Araçları</h1>
@@ -19,7 +37,7 @@ export default function AraclarPage() {
         </p>
       </div>
 
-      <HesaplamaAraclari />
+      <HesaplamaAraclari kidemTavani={kidemTavani} tavanTarihi={tavanTarihi} />
     </div>
   );
 }

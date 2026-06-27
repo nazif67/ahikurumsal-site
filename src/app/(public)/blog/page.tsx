@@ -58,6 +58,9 @@ export default async function BlogIndexPage() {
             {post.excerpt && (
               <p className="mt-2 text-gray-500 line-clamp-2">{post.excerpt}</p>
             )}
+            <p className="mt-3 text-sm text-blue-600 font-medium">
+              Devamını oku →
+            </p>
           </Link>
         ))}
       </div>

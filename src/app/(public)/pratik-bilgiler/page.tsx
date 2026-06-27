@@ -62,6 +62,9 @@ export default async function PratikBilgilerPage() {
                 {haber.excerpt}
               </p>
             )}
+            <p className="mt-3 text-sm text-blue-600 font-medium">
+              Devamını oku →
+            </p>
           </Link>
         ))}
       </div>
