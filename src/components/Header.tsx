@@ -8,6 +8,7 @@ const NAV_LINKS = [
   { href: "/duyurular", label: "Duyurular" },
   { href: "/blog", label: "Blog" },
   { href: "/pratik-bilgiler", label: "Pratik Bilgiler" },
+  { href: "/hazir-sablonlar", label: "Hazır Şablonlar" },
   { href: "/araclar", label: "Araçlar" },
   { href: "/hakkimda", label: "Hakkımda" },
   { href: "/iletisim", label: "İletişim" },
