@@ -57,21 +57,6 @@ export default async function IletisimPage() {
               </a>
             </div>
           )}
-          {profile?.linkedin && (
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wide text-gray-400 mb-1">
-                LinkedIn
-              </p>
-              <a
-                href={profile.linkedin}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm text-gray-700 hover:text-brand transition-colors"
-              >
-                Profili görüntüle →
-              </a>
-            </div>
-          )}
         </aside>
       </div>
     </div>
