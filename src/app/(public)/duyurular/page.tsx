@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { strapiGetAll } from "@/lib/strapi";
 
 export const revalidate = 60;
@@ -36,10 +37,11 @@ export default async function DuyurularPage() {
         )}
 
         {duyurular.map((d) => (
-          <div
+          <Link
             key={d.documentId}
-            className={`block rounded-xl border bg-white p-5 ${
-              d.pinned ? "border-blue-200" : "border-gray-200"
+            href={`/duyurular/${d.documentId}`}
+            className={`block rounded-xl border bg-white p-5 hover:shadow-md transition-all ${
+              d.pinned ? "border-blue-200 hover:border-blue-300" : "border-gray-200 hover:border-blue-200"
             }`}
           >
             <div className="flex items-center gap-2 mb-1">
@@ -61,9 +63,13 @@ export default async function DuyurularPage() {
             </h2>
 
             {d.content && (
-              <p className="mt-2 text-gray-500">{d.content}</p>
+              <p className="mt-2 text-gray-500 line-clamp-3">{d.content}</p>
             )}
-          </div>
+
+            <p className="mt-3 text-sm text-blue-600 font-medium">
+              Devamını oku →
+            </p>
+          </Link>
         ))}
       </div>
     </div>
