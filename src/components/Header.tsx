@@ -20,9 +20,9 @@ export default function Header() {
   return (
     <header className="border-b border-gray-200 bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4">
-        <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
-          <span className="text-lg font-bold text-brand">İK</span>
-          <span className="text-lg font-semibold text-gray-900">Danışmanlık</span>
+        <Link href="/" className="flex flex-col leading-tight" onClick={() => setOpen(false)}>
+          <span className="text-lg font-bold text-brand">Ahikurumsal</span>
+          <span className="text-xs font-medium text-gray-500">İK Danışmanlık</span>
         </Link>
 
         {/* Desktop nav */}
