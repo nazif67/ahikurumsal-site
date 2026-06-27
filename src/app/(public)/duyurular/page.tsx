@@ -23,47 +23,49 @@ export default async function DuyurularPage() {
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-12">
-      <h1 className="text-3xl font-bold text-gray-900 mb-2">Duyurular</h1>
-      <p className="text-gray-500 mb-8">
+      <h1 className="text-3xl font-bold text-gray-900">Duyurular</h1>
+      <p className="mt-2 text-gray-500">
         Güncel duyurular ve önemli bilgilendirmeler
       </p>
 
-      {duyurular.length === 0 ? (
-        <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-          <p className="text-gray-500">Henüz duyuru bulunmuyor.</p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {duyurular.map((d) => (
-            <div
-              key={d.documentId}
-              className={`bg-white rounded-xl border p-6 ${
-                d.pinned ? "border-blue-200 bg-blue-50/30" : "border-gray-200"
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-2">
-                {d.pinned && (
-                  <span className="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full font-medium">
-                    Sabit
-                  </span>
-                )}
-                {d.category && (
-                  <span className="text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full">
-                    {d.category}
-                  </span>
-                )}
-                {d.date && (
-                  <span className="text-xs text-gray-400">{d.date}</span>
-                )}
-              </div>
-              <h2 className="font-semibold text-gray-900 text-lg">{d.title}</h2>
-              <p className="text-gray-600 mt-2 text-sm leading-relaxed">
-                {d.content}
-              </p>
+      <div className="mt-8 space-y-6">
+        {duyurular.length === 0 && (
+          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
+            <p className="text-gray-500">Henüz duyuru bulunmuyor.</p>
+          </div>
+        )}
+
+        {duyurular.map((d) => (
+          <div
+            key={d.documentId}
+            className={`block rounded-xl border bg-white p-5 ${
+              d.pinned ? "border-blue-200" : "border-gray-200"
+            }`}
+          >
+            <div className="flex items-center gap-2 mb-1">
+              {d.date && <p className="text-xs text-gray-400">{d.date}</p>}
+              {d.pinned && (
+                <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full font-medium">
+                  Sabit
+                </span>
+              )}
+              {d.category && (
+                <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
+                  {d.category}
+                </span>
+              )}
             </div>
-          ))}
-        </div>
-      )}
+
+            <h2 className="mt-1 text-xl font-semibold text-gray-900">
+              {d.title}
+            </h2>
+
+            {d.content && (
+              <p className="mt-2 text-gray-500">{d.content}</p>
+            )}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
