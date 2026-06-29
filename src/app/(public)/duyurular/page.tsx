@@ -6,6 +6,7 @@ export const metadata = { title: "Duyurular" };
 
 type Duyuru = {
   title: string;
+  slug: string;
   content: string;
   date: string;
   category: string;
@@ -39,7 +40,7 @@ export default async function DuyurularPage() {
         {duyurular.map((d) => (
           <Link
             key={d.documentId}
-            href={`/duyurular/${d.documentId}`}
+            href={`/duyurular/${d.slug}`}
             className={`block rounded-xl border bg-white p-5 hover:shadow-md transition-all ${
               d.pinned ? "border-blue-200 hover:border-blue-300" : "border-gray-200 hover:border-blue-200"
             }`}

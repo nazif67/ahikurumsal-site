@@ -1,25 +1,41 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { strapiGetSingle } from "@/lib/strapi";
+import { strapiGetAll } from "@/lib/strapi";
 
 export const revalidate = 60;
 
 type Duyuru = {
   title: string;
+  slug: string;
   content: string;
   date: string;
   category: string;
   pinned: boolean;
 };
 
+export async function generateStaticParams() {
+  try {
+    const duyurular = await strapiGetAll<Duyuru>("/duyurular", {
+      "pagination[pageSize]": "1000",
+      fields: "slug",
+    });
+    return duyurular.map((d) => ({ slug: d.slug }));
+  } catch {
+    return [];
+  }
+}
+
 export async function generateMetadata({
   params,
 }: {
-  params: { documentId: string };
+  params: { slug: string };
 }) {
   try {
-    const data = await strapiGetSingle<Duyuru>(`/duyurular/${params.documentId}`);
-    if (data) return { title: data.title };
+    const data = await strapiGetAll<Duyuru>("/duyurular", {
+      "filters[slug][$eq]": params.slug,
+      fields: "title",
+    });
+    if (data.length > 0) return { title: data[0].title };
   } catch {}
   return { title: "Duyuru bulunamadı" };
 }
@@ -27,12 +43,15 @@ export async function generateMetadata({
 export default async function DuyuruDetailPage({
   params,
 }: {
-  params: { documentId: string };
+  params: { slug: string };
 }) {
-  let duyuru: (Duyuru & { id: number; documentId: string }) | null = null;
+  let duyuru: (Duyuru & { id: number; documentId: string }) | undefined;
 
   try {
-    duyuru = await strapiGetSingle<Duyuru>(`/duyurular/${params.documentId}`);
+    const data = await strapiGetAll<Duyuru>("/duyurular", {
+      "filters[slug][$eq]": params.slug,
+    });
+    duyuru = data[0];
   } catch {
     notFound();
   }
