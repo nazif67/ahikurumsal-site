@@ -494,15 +494,185 @@ function MaasZammiCalc() {
   );
 }
 
+// ─── Yıllık İzin ──────────────────────────────────────────────────────────────
+function calcHizmet(baslangic: Date, bitis: Date) {
+  let yil = bitis.getFullYear() - baslangic.getFullYear();
+  let ay = bitis.getMonth() - baslangic.getMonth();
+  let gun = bitis.getDate() - baslangic.getDate();
+  if (gun < 0) {
+    ay--;
+    gun += new Date(bitis.getFullYear(), bitis.getMonth(), 0).getDate();
+  }
+  if (ay < 0) { yil--; ay += 12; }
+  return { yil, ay, gun };
+}
+
+function izinGunuHesapla(yil: number, yas: number | null): { gun: number; kural: string } {
+  if (yas !== null && yas < 18) return { gun: 20, kural: "18 yaş altı — en az 20 iş günü" };
+  if (yas !== null && yas >= 50) return { gun: 20, kural: "50 yaş ve üzeri — en az 20 iş günü" };
+  if (yil < 5)  return { gun: 14, kural: "1–5 yıl kıdem — 14 iş günü" };
+  if (yil < 15) return { gun: 20, kural: "5–15 yıl kıdem — 20 iş günü" };
+  return { gun: 26, kural: "15 yıl ve üzeri kıdem — 26 iş günü" };
+}
+
+function YillikIzinCalc() {
+  const today = new Date().toISOString().split("T")[0];
+  const [baslangic, setBaslangic] = useState("");
+  const [hesapTarih, setHesapTarih] = useState(today);
+  const [dogumTarih, setDogumTarih] = useState("");
+  const [brut, setBrut] = useState("");
+  const [kullanilanGun, setKullanilanGun] = useState("");
+  const [result, setResult] = useState<{
+    sure: { yil: number; ay: number; gun: number };
+    izinGun: number;
+    kural: string;
+    sonrakiHakedis: string;
+    gunlukUcret: number | null;
+    izinUcreti: number | null;
+    kalanGun: number | null;
+    yas: number | null;
+  } | null>(null);
+  const [hataMsg, setHataMsg] = useState("");
+
+  function hesapla() {
+    setHataMsg("");
+    setResult(null);
+    if (!baslangic || !hesapTarih) return;
+    const b = new Date(baslangic);
+    const h = new Date(hesapTarih);
+    if (h <= b) {
+      setHataMsg("Hesaplama tarihi işe başlama tarihinden sonra olmalıdır.");
+      return;
+    }
+    const sure = calcHizmet(b, h);
+    if (sure.yil < 1) {
+      const hakedis = new Date(b);
+      hakedis.setFullYear(b.getFullYear() + 1);
+      setHataMsg(`Henüz yıllık izin hakkı kazanılmadı. 1 yıllık hak ediş tarihi: ${hakedis.toLocaleDateString("tr-TR")}`);
+      return;
+    }
+    let yas: number | null = null;
+    if (dogumTarih) {
+      yas = calcHizmet(new Date(dogumTarih), h).yil;
+    }
+    const { gun, kural } = izinGunuHesapla(sure.yil, yas);
+    const sonraki = new Date(b);
+    sonraki.setFullYear(b.getFullYear() + sure.yil + 1);
+    const gunlukUcret = brut ? parseFloat(brut) / 30 : null;
+    const izinUcreti = gunlukUcret ? gunlukUcret * gun : null;
+    const kullanilan = kullanilanGun ? parseInt(kullanilanGun) : null;
+    const kalanGun = kullanilan !== null ? gun - kullanilan : null;
+    setResult({ sure, izinGun: gun, kural, sonrakiHakedis: sonraki.toLocaleDateString("tr-TR"), gunlukUcret, izinUcreti, kalanGun, yas });
+  }
+
+  return (
+    <div className="space-y-5">
+      <p className="text-sm text-gray-500">
+        İş Kanunu m.53 — 1 yılını tamamlayan çalışanlar kıdemine ve yaşına göre yıllık ücretli izne hak kazanır.
+      </p>
+
+      <div className="bg-gray-50 rounded-lg border border-gray-200 p-3 text-sm text-gray-600 space-y-1">
+        <p>• 1–5 yıl kıdem → <strong>14 iş günü</strong></p>
+        <p>• 5–15 yıl kıdem → <strong>20 iş günü</strong></p>
+        <p>• 15 yıl ve üzeri → <strong>26 iş günü</strong></p>
+        <p className="font-medium" style={{ color: "#1e3a8a" }}>• 18 yaş altı veya 50 yaş ve üzeri → en az <strong>20 iş günü</strong></p>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">İşe Başlama Tarihi</label>
+          <input type="date" value={baslangic} onChange={(e) => setBaslangic(e.target.value)} className={INPUT} />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">Hesaplama Tarihi</label>
+          <input type="date" value={hesapTarih} onChange={(e) => setHesapTarih(e.target.value)} className={INPUT} />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Doğum Tarihi <span className="font-normal text-gray-400">(yaş kontrolü için)</span>
+          </label>
+          <input type="date" value={dogumTarih} onChange={(e) => setDogumTarih(e.target.value)} className={INPUT} />
+        </div>
+        <div>
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Kullanılan İzin Günü <span className="font-normal text-gray-400">(kalan için)</span>
+          </label>
+          <input type="number" min="0" value={kullanilanGun} onChange={(e) => setKullanilanGun(e.target.value)} placeholder="0" className={INPUT} />
+        </div>
+        <div className="sm:col-span-2">
+          <label className="block text-xs font-medium text-gray-600 mb-1">
+            Brüt Aylık Ücret (TL) <span className="font-normal text-gray-400">(izin ücreti için)</span>
+          </label>
+          <input type="number" value={brut} onChange={(e) => setBrut(e.target.value)} placeholder="30000" className={INPUT} />
+        </div>
+      </div>
+
+      <button onClick={hesapla} className={BTN}>Hesapla</button>
+
+      {hataMsg && (
+        <div className="flex gap-2 bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-sm text-amber-800">
+          <span className="flex-shrink-0">⚠</span>
+          <p>{hataMsg}</p>
+        </div>
+      )}
+
+      {result && (
+        <div className="bg-gray-50 rounded-xl p-4 border border-gray-100 space-y-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <ResultCard
+              label="Hizmet Süresi"
+              value={`${result.sure.yil} yıl ${result.sure.ay} ay`}
+            />
+            <ResultCard
+              label="Yıllık İzin Hakkı"
+              value={`${result.izinGun} iş günü`}
+              highlight
+            />
+            {result.kalanGun !== null && (
+              <ResultCard
+                label="Kalan İzin"
+                value={`${result.kalanGun} iş günü`}
+                highlight={result.kalanGun > 0}
+              />
+            )}
+            <ResultCard label="Sonraki Hak Ediş" value={result.sonrakiHakedis} />
+          </div>
+
+          <div className="flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-medium" style={{ background: "rgba(30,58,138,0.06)", color: "#1e3a8a", border: "1px solid rgba(30,58,138,0.15)" }}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {result.kural}
+            {result.yas !== null && (
+              <span className="font-normal text-gray-500 ml-1">(yaş: {result.yas})</span>
+            )}
+          </div>
+
+          {result.gunlukUcret && result.izinUcreti && (
+            <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-200">
+              <ResultCard label="Günlük Brüt Ücret" value={`${fmt(result.gunlukUcret)} TL`} />
+              <ResultCard label="İzin Ücreti (Brüt)" value={`${fmt(result.izinUcreti)} TL`} highlight />
+            </div>
+          )}
+          <p className="text-xs text-gray-400">
+            İş K. m.53 — İzin günleri iş günü bazlıdır; hafta tatili ve resmi tatiller izin süresine dahil değildir.
+          </p>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Tab wrapper ───────────────────────────────────────────────────────────────
 import React from "react";
 
-const TAB_IDS = ["kidem", "ihbar", "fazlaMesai", "maasZammi"] as const;
+const TAB_IDS = ["kidem", "ihbar", "fazlaMesai", "maasZammi", "yillikIzin"] as const;
 const TAB_LABELS: Record<string, string> = {
   kidem: "Kıdem Tazminatı",
   ihbar: "İhbar Tazminatı",
   fazlaMesai: "Fazla Mesai",
   maasZammi: "Maaş Zammı",
+  yillikIzin: "Yıllık İzin",
 };
 
 export default function HesaplamaAraclari({
@@ -540,6 +710,7 @@ export default function HesaplamaAraclari({
         {activeTab === "ihbar" && <IhbarCalc />}
         {activeTab === "fazlaMesai" && <FazlaMesaiCalc />}
         {activeTab === "maasZammi" && <MaasZammiCalc />}
+        {activeTab === "yillikIzin" && <YillikIzinCalc />}
       </div>
     </div>
   );
