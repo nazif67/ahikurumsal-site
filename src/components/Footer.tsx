@@ -4,7 +4,7 @@ import Image from "next/image";
 const NAV_COL = [
   { href: "/blog", label: "Blog" },
   { href: "/duyurular", label: "Duyurular" },
-  { href: "/pratik-bilgiler", label: "Pratik Bilgiler" },
+  { href: "/haberler", label: "Haberler" },
   { href: "/hazir-sablonlar", label: "Hazır Şablonlar" },
   { href: "/araclar", label: "Araçlar" },
 ];

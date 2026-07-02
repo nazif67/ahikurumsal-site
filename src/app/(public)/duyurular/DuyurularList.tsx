@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
+import { ViewBadge } from "@/components/Views";
 
 type Duyuru = {
   id: number;
@@ -12,6 +13,7 @@ type Duyuru = {
   date: string;
   category: string;
   pinned: boolean;
+  views: number;
 };
 
 export default function DuyurularList({ duyurular }: { duyurular: Duyuru[] }) {
@@ -117,6 +119,9 @@ export default function DuyurularList({ duyurular }: { duyurular: Duyuru[] }) {
                   {d.category}
                 </span>
               )}
+              <span className="ml-auto">
+                <ViewBadge views={d.views} />
+              </span>
             </div>
             <h2 className="mt-1 text-xl font-semibold text-gray-900">{d.title}</h2>
             {d.content && (

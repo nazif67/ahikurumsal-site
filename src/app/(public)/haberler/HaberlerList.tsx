@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
+import { ViewBadge } from "@/components/Views";
 
 type Haber = {
   id: number;
@@ -11,9 +12,10 @@ type Haber = {
   excerpt: string;
   date: string;
   category: string;
+  views: number;
 };
 
-export default function PratikBilgilerList({ haberler }: { haberler: Haber[] }) {
+export default function HaberlerList({ haberler }: { haberler: Haber[] }) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tümü");
 
@@ -40,7 +42,7 @@ export default function PratikBilgilerList({ haberler }: { haberler: Haber[] }) 
       <div className="mt-8 relative">
         <input
           type="text"
-          placeholder="Pratik bilgi ara..."
+          placeholder="Haber ara..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           className="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 pl-10 text-sm text-gray-800 placeholder-gray-400 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
@@ -77,7 +79,7 @@ export default function PratikBilgilerList({ haberler }: { haberler: Haber[] }) 
               onClick={() => setActiveCategory(cat)}
               className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
                 activeCategory === cat
-                  ? "bg-green-600 text-white"
+                  ? "bg-blue-600 text-white"
                   : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
@@ -97,18 +99,21 @@ export default function PratikBilgilerList({ haberler }: { haberler: Haber[] }) 
         {filtered.map((haber) => (
           <Link
             key={haber.slug}
-            href={`/pratik-bilgiler/${haber.slug}`}
-            className="block rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md hover:border-green-200 transition-all"
+            href={`/haberler/${haber.slug}`}
+            className="block rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md hover:border-blue-200 transition-all"
           >
             <div className="flex items-center gap-2 mb-1">
               {haber.date && (
                 <p className="text-xs text-gray-400">{haber.date}</p>
               )}
               {haber.category && (
-                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
+                <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
                   {haber.category}
                 </span>
               )}
+              <span className="ml-auto">
+                <ViewBadge views={haber.views} />
+              </span>
             </div>
             <h2 className="mt-1 text-lg font-semibold text-gray-900">{haber.title}</h2>
             {haber.excerpt && (

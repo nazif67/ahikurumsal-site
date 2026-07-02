@@ -8,8 +8,8 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      { source: "/haberler", destination: "/pratik-bilgiler", permanent: true },
-      { source: "/haberler/:slug", destination: "/pratik-bilgiler/:slug", permanent: true },
+      { source: "/pratik-bilgiler", destination: "/haberler", permanent: true },
+      { source: "/pratik-bilgiler/:slug", destination: "/haberler/:slug", permanent: true },
     ];
   },
   images: {

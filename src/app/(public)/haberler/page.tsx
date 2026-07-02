@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { strapiGetAll } from "@/lib/strapi";
+import HaberlerList from "./HaberlerList";
 
 export const revalidate = 60;
 export const metadata = { title: "Haberler" };
@@ -10,6 +10,7 @@ type Haber = {
   excerpt: string;
   date: string;
   category: string;
+  views: number;
 };
 
 export default async function HaberlerPage() {
@@ -17,7 +18,7 @@ export default async function HaberlerPage() {
   try {
     haberler = await strapiGetAll<Haber>("/haberler", {
       sort: "date:desc",
-      fields: "title,slug,excerpt,date,category",
+      fields: "title,slug,excerpt,date,category,views",
     });
   } catch {
     haberler = [];
@@ -29,42 +30,15 @@ export default async function HaberlerPage() {
       <p className="mt-2 text-gray-500">
         İş hukuku, mevzuat ve İK dünyasından güncel haberler.
       </p>
-
-      <div className="mt-8 space-y-4">
-        {haberler.length === 0 && (
-          <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
-            <p className="text-gray-500">
-              Henüz haber yok. Strapi admin panelinden haber ekleyin.
-            </p>
-          </div>
-        )}
-        {haberler.map((haber) => (
-          <Link
-            key={haber.slug}
-            href={`/haberler/${haber.slug}`}
-            className="block rounded-xl border border-gray-200 bg-white p-5 hover:shadow-md hover:border-blue-200 transition-all"
-          >
-            <div className="flex items-center gap-2 mb-1">
-              {haber.date && (
-                <p className="text-xs text-gray-400">{haber.date}</p>
-              )}
-              {haber.category && (
-                <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
-                  {haber.category}
-                </span>
-              )}
-            </div>
-            <h2 className="mt-1 text-lg font-semibold text-gray-900">
-              {haber.title}
-            </h2>
-            {haber.excerpt && (
-              <p className="mt-2 text-sm text-gray-500 line-clamp-2">
-                {haber.excerpt}
-              </p>
-            )}
-          </Link>
-        ))}
-      </div>
+      {haberler.length === 0 ? (
+        <div className="mt-8 bg-white rounded-xl border border-gray-200 p-10 text-center">
+          <p className="text-gray-500">
+            Henüz haber yok. Strapi admin panelinden haber ekleyin.
+          </p>
+        </div>
+      ) : (
+        <HaberlerList haberler={haberler} />
+      )}
     </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, useMemo } from "react";
+import { ViewBadge } from "@/components/Views";
 
 type Blog = {
   id: number;
@@ -11,6 +12,7 @@ type Blog = {
   excerpt: string;
   date: string;
   category: string;
+  views: number;
 };
 
 export default function BlogList({ posts }: { posts: Blog[] }) {
@@ -107,6 +109,9 @@ export default function BlogList({ posts }: { posts: Blog[] }) {
                   {post.category}
                 </span>
               )}
+              <span className="ml-auto">
+                <ViewBadge views={post.views} />
+              </span>
             </div>
             <h2 className="mt-1 text-xl font-semibold text-gray-900">{post.title}</h2>
             {post.excerpt && (

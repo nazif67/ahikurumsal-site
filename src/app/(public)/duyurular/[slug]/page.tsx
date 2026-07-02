@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { strapiGetAll } from "@/lib/strapi";
+import { ViewCounter } from "@/components/Views";
 
 export const revalidate = 60;
 
@@ -11,6 +12,7 @@ type Duyuru = {
   date: string;
   category: string;
   pinned: boolean;
+  views: number;
 };
 
 export async function generateStaticParams() {
@@ -79,6 +81,9 @@ export default async function DuyuruDetailPage({
             {duyuru.category}
           </span>
         )}
+        <span className="ml-auto">
+          <ViewCounter type="duyurular" slug={duyuru.slug} initialViews={duyuru.views ?? 0} />
+        </span>
       </div>
 
       <h1 className="text-3xl font-bold text-gray-900">{duyuru.title}</h1>

@@ -10,6 +10,7 @@ type Blog = {
   excerpt: string;
   date: string;
   category: string;
+  views: number;
 };
 
 export default async function BlogIndexPage() {
@@ -17,7 +18,7 @@ export default async function BlogIndexPage() {
   try {
     posts = await strapiGetAll<Blog>("/blogs", {
       sort: "date:desc",
-      fields: "title,slug,excerpt,date,category",
+      fields: "title,slug,excerpt,date,category,views",
     });
   } catch {
     posts = [];

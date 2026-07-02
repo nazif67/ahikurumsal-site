@@ -44,15 +44,31 @@ export async function strapiPost<T>(
   path: string,
   data: Record<string, unknown>
 ): Promise<T> {
+  const token = process.env.STRAPI_API_TOKEN;
   const res = await fetch(`${STRAPI_URL}/api${path}`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
     body: JSON.stringify({ data }),
   });
 
   if (!res.ok) throw new Error(`Strapi hata: ${res.status} — ${path}`);
   const json = await res.json();
   return json.data;
+}
+
+export async function strapiIncrementView(
+  collection: "haberler" | "duyurular" | "blogs",
+  slug: string
+): Promise<number | null> {
+  const res = await fetch(`${STRAPI_URL}/api/${collection}/${slug}/view`, {
+    method: "POST",
+  });
+  if (!res.ok) return null;
+  const json = await res.json();
+  return typeof json.views === "number" ? json.views : null;
 }
 
 export async function strapiGetSingle<T>(

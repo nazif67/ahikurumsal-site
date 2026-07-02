@@ -42,7 +42,7 @@ const UZMANLIK = [
     ),
     title: "İş Hukuku",
     desc: "İş kanunu mevzuatı, hak ve yükümlülükler hakkında güncel bilgiler.",
-    href: "/pratik-bilgiler",
+    href: "/haberler",
   },
   {
     icon: (
@@ -52,7 +52,7 @@ const UZMANLIK = [
     ),
     title: "Yabancı Çalışma İzni",
     desc: "Yabancı uyruklu çalışanların izin süreçleri ve mevzuat rehberi.",
-    href: "/pratik-bilgiler",
+    href: "/haberler",
   },
 ];
 

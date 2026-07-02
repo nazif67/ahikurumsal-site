@@ -11,6 +11,7 @@ type Duyuru = {
   date: string;
   category: string;
   pinned: boolean;
+  views: number;
 };
 
 export default async function DuyurularPage() {

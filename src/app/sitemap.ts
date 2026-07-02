@@ -8,7 +8,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: BASE_URL, priority: 1.0, changeFrequency: "weekly" },
     { url: `${BASE_URL}/blog`, priority: 0.8, changeFrequency: "weekly" },
     { url: `${BASE_URL}/duyurular`, priority: 0.8, changeFrequency: "weekly" },
-    { url: `${BASE_URL}/pratik-bilgiler`, priority: 0.8, changeFrequency: "weekly" },
+    { url: `${BASE_URL}/haberler`, priority: 0.8, changeFrequency: "weekly" },
     { url: `${BASE_URL}/hazir-sablonlar`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/araclar`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/hakkimda`, priority: 0.6, changeFrequency: "monthly" },
@@ -44,7 +44,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const haberPages: MetadataRoute.Sitemap = haberler
     .filter((h) => h.slug)
     .map((h) => ({
-      url: `${BASE_URL}/pratik-bilgiler/${h.slug}`,
+      url: `${BASE_URL}/haberler/${h.slug}`,
       lastModified: h.updatedAt ? new Date(h.updatedAt) : undefined,
       priority: 0.7,
       changeFrequency: "monthly",
