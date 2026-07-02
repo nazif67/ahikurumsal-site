@@ -89,3 +89,50 @@ pm2 restart kisisel-site
 
 `deploy.sh` olarak kaydedip `chmod +x deploy.sh` yaptıktan sonra her
 güncellemede sadece `./deploy.sh` çalıştırmanız yeterli.
+
+## 7) Strapi backend güncelleme
+
+Strapi VPS'te ayrı bir PM2 süreci olarak çalışır (`pm2 list` çıktısında adı
+`strapi`). Klasör yolunu bilmiyorsanız önce şununla bulun:
+
+```bash
+pm2 describe strapi | grep -i "exec cwd"
+```
+
+Klasör yolunu bulduktan sonra güncelleme adımları (yol örnektir, kendi
+bulduğunuz yolla değiştirin):
+
+```bash
+cd /var/www/kisisel-strapi
+git pull origin master
+npm install
+npm run build
+pm2 restart strapi
+```
+
+### Restart sonrası mutlaka kontrol edin
+
+```bash
+pm2 logs strapi --lines 50 --nostream
+```
+
+Backend'deki bootstrap script'i, prod veritabanında "Next.js Server" adlı
+bir API token yoksa otomatik olarak yeni bir tane oluşturur ve log'a
+şöyle yazdırır:
+
+```
+=== YENİ STRAPI API TOKEN OLUŞTURULDU ===
+kisisel-site/.env.local dosyasındaki STRAPI_API_TOKEN değerini bununla değiştirin:
+<uzun bir token>
+==========================================
+```
+
+Bu blok görünürse token'ı kopyalayıp **frontend tarafındaki**
+(`/var/www/kisisel-site`) prod ortam değişkenlerine (`.env.local` veya
+pm2 ecosystem dosyanızdaki `STRAPI_API_TOKEN`) yazın, sonra
+`pm2 restart kisisel-site` ile yeniden başlatın. Aksi halde canlıda
+yorum gönderme (haberler sayfasındaki yorum formu) çalışmaz.
+
+Bu adım normalde **sadece ilk deploy sonrası bir kez** gerekir — token
+veritabanında kalıcı olduğu için sonraki restart'larda tekrar
+oluşturulmaz.

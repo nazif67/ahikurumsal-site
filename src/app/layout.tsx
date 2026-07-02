@@ -6,9 +6,10 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://ahikurumsal.com"),
   title: {
-    default: "İK Danışmanlık",
-    template: "%s | İK Danışmanlık",
+    default: "Ahikurumsal | İnsan Kaynakları Danışmanlığı",
+    template: "%s | Ahikurumsal",
   },
   description: "İnsan kaynakları danışmanlığı, blog yazıları ve hesaplama araçları.",
 };
