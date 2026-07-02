@@ -156,6 +156,12 @@ export default async function HomePage() {
                 >
                   Blog
                 </Link>
+                <Link
+                  href="/haberler"
+                  className="rounded-lg border border-white/30 px-5 py-2.5 font-semibold text-white/80 hover:text-white hover:border-white/50 transition-colors text-sm"
+                >
+                  Haberler
+                </Link>
               </div>
             </div>
 
@@ -179,40 +185,57 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Uzmanlık Alanları */}
-      <section className="bg-white py-20">
-        <div className="mx-auto max-w-6xl px-4 sm:px-6">
-          <div className="text-center mb-10">
-            <h2 className="text-2xl font-bold text-gray-900">Uzmanlık Alanları</h2>
-            <p className="text-gray-500 mt-2 text-sm">Deneyim ve bilgi birikimimizle desteklediğimiz alanlar</p>
-          </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-            {UZMANLIK.map((item) => (
-              <Link
-                key={item.title}
-                href={item.href}
-                className="group bg-white rounded-2xl border border-gray-200 p-6 hover:border-brand hover:shadow-lg transition-all duration-200"
-              >
-                <div className="w-11 h-11 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-4 group-hover:bg-brand group-hover:text-white transition-colors duration-200">
-                  {item.icon}
-                </div>
-                <h3 className="font-semibold text-gray-900 group-hover:text-brand transition-colors">
-                  {item.title}
-                </h3>
-                <p className="text-sm text-gray-500 mt-2 leading-relaxed">
-                  {item.desc}
-                </p>
-                <div className="mt-4 flex items-center text-xs font-medium text-brand opacity-0 group-hover:opacity-100 transition-opacity">
-                  İncele
-                  <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </div>
+      {/* Haberlerden Kesitler */}
+      {latestHaberler.length > 0 && (
+        <section className="bg-white py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Haberlerden Kesitler</h2>
+                <p className="text-gray-500 text-sm mt-1">İş hukuku, mevzuat ve İK dünyasından güncel haberler</p>
+              </div>
+              <Link href="/haberler" className="text-sm font-medium text-brand hover:underline flex items-center gap-1">
+                Tümünü gör
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
               </Link>
-            ))}
+            </div>
+            <div className="grid gap-5 sm:grid-cols-3">
+              {latestHaberler.map((haber) => (
+                <Link
+                  key={haber.slug}
+                  href={`/haberler/${haber.slug}`}
+                  className="group block rounded-2xl border border-gray-200 bg-gray-50 p-6 transition-all hover:shadow-lg hover:border-brand/30"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="text-xs text-gray-400">{haber.date}</p>
+                    {haber.category && (
+                      <span className="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full">
+                        {haber.category}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 group-hover:text-brand transition-colors leading-snug">
+                    {haber.title}
+                  </h3>
+                  {haber.excerpt && (
+                    <p className="mt-2 text-sm text-gray-500 line-clamp-2 leading-relaxed">
+                      {haber.excerpt}
+                    </p>
+                  )}
+                  <div className="mt-4 flex items-center text-xs font-medium text-brand">
+                    Devamını oku
+                    <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Araçlar */}
       <section className="bg-gray-50 py-20">
@@ -295,60 +318,8 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* Haberlerden Kesitler */}
-      {latestHaberler.length > 0 && (
-        <section className="bg-gray-50 py-20">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <div className="mb-8 flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-bold text-gray-900">Haberlerden Kesitler</h2>
-                <p className="text-gray-500 text-sm mt-1">İş hukuku, mevzuat ve İK dünyasından güncel haberler</p>
-              </div>
-              <Link href="/haberler" className="text-sm font-medium text-brand hover:underline flex items-center gap-1">
-                Tümünü gör
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </Link>
-            </div>
-            <div className="grid gap-5 sm:grid-cols-3">
-              {latestHaberler.map((haber) => (
-                <Link
-                  key={haber.slug}
-                  href={`/haberler/${haber.slug}`}
-                  className="group block rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:shadow-lg hover:border-brand/30"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <p className="text-xs text-gray-400">{haber.date}</p>
-                    {haber.category && (
-                      <span className="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full">
-                        {haber.category}
-                      </span>
-                    )}
-                  </div>
-                  <h3 className="font-semibold text-gray-900 group-hover:text-brand transition-colors leading-snug">
-                    {haber.title}
-                  </h3>
-                  {haber.excerpt && (
-                    <p className="mt-2 text-sm text-gray-500 line-clamp-2 leading-relaxed">
-                      {haber.excerpt}
-                    </p>
-                  )}
-                  <div className="mt-4 flex items-center text-xs font-medium text-brand">
-                    Devamını oku
-                    <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                    </svg>
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </section>
-      )}
-
       {/* Son Yazılar */}
-      <section className="bg-white py-20">
+      <section className="bg-gray-50 py-20">
         <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-8 flex items-center justify-between">
             <div>
@@ -390,6 +361,41 @@ export default async function HomePage() {
               ))}
             </div>
           )}
+        </div>
+      </section>
+
+      {/* Uzmanlık Alanları */}
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="text-center mb-10">
+            <h2 className="text-2xl font-bold text-gray-900">Uzmanlık Alanları</h2>
+            <p className="text-gray-500 mt-2 text-sm">Deneyim ve bilgi birikimimizle desteklediğimiz alanlar</p>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {UZMANLIK.map((item) => (
+              <Link
+                key={item.title}
+                href={item.href}
+                className="group bg-white rounded-2xl border border-gray-200 p-6 hover:border-brand hover:shadow-lg transition-all duration-200"
+              >
+                <div className="w-11 h-11 rounded-xl bg-brand/10 flex items-center justify-center text-brand mb-4 group-hover:bg-brand group-hover:text-white transition-colors duration-200">
+                  {item.icon}
+                </div>
+                <h3 className="font-semibold text-gray-900 group-hover:text-brand transition-colors">
+                  {item.title}
+                </h3>
+                <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+                  {item.desc}
+                </p>
+                <div className="mt-4 flex items-center text-xs font-medium text-brand opacity-0 group-hover:opacity-100 transition-opacity">
+                  İncele
+                  <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 
