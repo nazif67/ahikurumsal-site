@@ -44,7 +44,7 @@ export default async function HazirSablonlarPage() {
   const strapiUrl = process.env.NEXT_PUBLIC_STRAPI_URL || getStrapiUrl();
 
   return (
-    <div className="mx-auto max-w-3xl px-4 py-12">
+    <div className="mx-auto max-w-4xl px-4 sm:px-6 py-16">
       <h1 className="text-3xl font-bold text-gray-900">Hazır Şablonlar</h1>
       <p className="mt-2 text-gray-500">
         İndirmeye hazır İK form ve şablonları

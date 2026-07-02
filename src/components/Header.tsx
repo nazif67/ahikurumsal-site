@@ -31,7 +31,7 @@ export default function Header() {
         scrolled ? "shadow-md" : ""
       }`}
     >
-      <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
+      <div className="mx-auto flex max-w-6xl items-center justify-between px-4 sm:px-6 py-3">
         <Link href="/" onClick={() => setOpen(false)}>
           <Image
             src="/ahikurumsal.jpg"

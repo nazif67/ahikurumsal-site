@@ -1,7 +1,10 @@
 import Link from "next/link";
-import { strapiGetAll } from "@/lib/strapi";
+import { strapiGetAll, strapiGetSingle } from "@/lib/strapi";
+import AraclarDemo from "@/components/AraclarDemo";
 
 export const revalidate = 60;
+
+const VARSAYILAN_TAVAN = 47228.43;
 
 type Blog = { title: string; slug: string; excerpt: string; date: string };
 type Duyuru = {
@@ -11,6 +14,13 @@ type Duyuru = {
   category: string;
   pinned: boolean;
   documentId: string;
+};
+type Haber = {
+  title: string;
+  slug: string;
+  excerpt: string;
+  date: string;
+  category: string;
 };
 
 const UZMANLIK = [
@@ -87,7 +97,7 @@ const HERO_FEATURES = [
 ];
 
 export default async function HomePage() {
-  const [latestPosts, latestDuyurular] = await Promise.all([
+  const [latestPosts, latestDuyurular, latestHaberler, kidemTavaniData] = await Promise.all([
     strapiGetAll<Blog>("/blogs", {
       "pagination[pageSize]": 3,
       sort: "date:desc",
@@ -98,13 +108,21 @@ export default async function HomePage() {
       sort: "pinned:desc,date:desc",
       fields: "title,content,date,category,pinned",
     }).catch(() => []),
+    strapiGetAll<Haber>("/haberler", {
+      "pagination[pageSize]": 3,
+      sort: "date:desc",
+      fields: "title,slug,excerpt,date,category",
+    }).catch(() => []),
+    strapiGetSingle<{ tutar: number }>("/kidem-tavan").catch(() => null),
   ]);
+
+  const kidemTavani = kidemTavaniData?.tutar || VARSAYILAN_TAVAN;
 
   return (
     <>
       {/* Hero */}
-      <section className="bg-gradient-to-br from-brand to-brand-dark py-20">
-        <div className="mx-auto max-w-5xl px-4">
+      <section className="bg-gradient-to-br from-brand to-brand-dark py-24">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="flex flex-col lg:flex-row items-center gap-12">
             <div className="flex-1">
               <span className="inline-block bg-white/15 text-white text-xs font-semibold px-3 py-1 rounded-full mb-5 uppercase tracking-widest">
@@ -162,8 +180,8 @@ export default async function HomePage() {
       </section>
 
       {/* Uzmanlık Alanları */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-5xl px-4">
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="text-center mb-10">
             <h2 className="text-2xl font-bold text-gray-900">Uzmanlık Alanları</h2>
             <p className="text-gray-500 mt-2 text-sm">Deneyim ve bilgi birikimimizle desteklediğimiz alanlar</p>
@@ -196,10 +214,42 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* Araçlar */}
+      <section className="bg-gray-50 py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
+          <div className="grid gap-10 lg:grid-cols-2 items-center">
+            <div>
+              <span className="inline-block bg-brand/10 text-brand text-xs font-semibold px-3 py-1 rounded-full mb-4 uppercase tracking-widest">
+                Hesaplama Araçları
+              </span>
+              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900">
+                Tazminatınızı saniyeler içinde hesaplayın
+              </h2>
+              <p className="mt-4 text-gray-500 leading-relaxed">
+                Kıdem tazminatı, ihbar tazminatı, fazla mesai, maaş zammı ve
+                yıllık izin hesaplamalarını ücretsiz araçlarımızla hemen
+                yapabilirsiniz. Aşağıda kıdem tazminatı hesaplayıcısını
+                deneyebilirsiniz — diğer tüm araçlar için "Araçlar"
+                sayfasını ziyaret edin.
+              </p>
+              <div className="mt-7 flex flex-wrap gap-3">
+                <Link
+                  href="/araclar"
+                  className="rounded-lg bg-brand px-5 py-2.5 font-semibold text-white hover:opacity-90 transition-opacity text-sm"
+                >
+                  Tüm Araçları Gör
+                </Link>
+              </div>
+            </div>
+            <AraclarDemo kidemTavani={kidemTavani} />
+          </div>
+        </div>
+      </section>
+
       {/* Son Duyurular */}
       {latestDuyurular.length > 0 && (
-        <section className="bg-gray-50 py-16">
-          <div className="mx-auto max-w-5xl px-4">
+        <section className="bg-white py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="mb-8 flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-bold text-gray-900">Son Duyurular</h2>
@@ -216,7 +266,7 @@ export default async function HomePage() {
               {latestDuyurular.map((d) => (
                 <div
                   key={d.title + d.date}
-                  className="flex items-start gap-4 bg-white border border-gray-200 rounded-2xl p-5 hover:shadow-md transition-shadow"
+                  className="flex items-start gap-4 bg-gray-50 border border-gray-200 rounded-2xl p-5 hover:shadow-md transition-shadow"
                 >
                   <div className={`w-1 self-stretch rounded-full flex-shrink-0 ${d.pinned ? "bg-amber-400" : "bg-brand"}`} />
                   <div className="flex-1 min-w-0">
@@ -245,9 +295,61 @@ export default async function HomePage() {
         </section>
       )}
 
+      {/* Haberlerden Kesitler */}
+      {latestHaberler.length > 0 && (
+        <section className="bg-gray-50 py-20">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <div className="mb-8 flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900">Haberlerden Kesitler</h2>
+                <p className="text-gray-500 text-sm mt-1">İş hukuku, mevzuat ve İK dünyasından güncel haberler</p>
+              </div>
+              <Link href="/haberler" className="text-sm font-medium text-brand hover:underline flex items-center gap-1">
+                Tümünü gör
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </Link>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-3">
+              {latestHaberler.map((haber) => (
+                <Link
+                  key={haber.slug}
+                  href={`/haberler/${haber.slug}`}
+                  className="group block rounded-2xl border border-gray-200 bg-white p-6 transition-all hover:shadow-lg hover:border-brand/30"
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <p className="text-xs text-gray-400">{haber.date}</p>
+                    {haber.category && (
+                      <span className="text-xs bg-brand/10 text-brand px-2 py-0.5 rounded-full">
+                        {haber.category}
+                      </span>
+                    )}
+                  </div>
+                  <h3 className="font-semibold text-gray-900 group-hover:text-brand transition-colors leading-snug">
+                    {haber.title}
+                  </h3>
+                  {haber.excerpt && (
+                    <p className="mt-2 text-sm text-gray-500 line-clamp-2 leading-relaxed">
+                      {haber.excerpt}
+                    </p>
+                  )}
+                  <div className="mt-4 flex items-center text-xs font-medium text-brand">
+                    Devamını oku
+                    <svg xmlns="http://www.w3.org/2000/svg" className="ml-1 h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
       {/* Son Yazılar */}
-      <section className="bg-white py-16">
-        <div className="mx-auto max-w-5xl px-4">
+      <section className="bg-white py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6">
           <div className="mb-8 flex items-center justify-between">
             <div>
               <h2 className="text-2xl font-bold text-gray-900">Son Yazılar</h2>
@@ -292,8 +394,8 @@ export default async function HomePage() {
       </section>
 
       {/* Hakkımda CTA */}
-      <section className="bg-gradient-to-br from-brand to-brand-dark py-16">
-        <div className="mx-auto max-w-5xl px-4 text-center">
+      <section className="bg-gradient-to-br from-brand to-brand-dark py-20">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 text-center">
           <h2 className="text-2xl font-bold text-white">Birlikte Çalışalım</h2>
           <p className="text-blue-100 mt-3 max-w-lg mx-auto text-sm leading-relaxed">
             İnsan kaynakları alanındaki deneyimlerimi ve bilgilerimi sizinle paylaşmaktan memnuniyet duyarım.
