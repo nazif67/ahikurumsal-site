@@ -162,8 +162,8 @@ function KidemCalc({ tavan, tavanTarihi }: { tavan: number; tavanTarihi: string 
 // ─── İhbar Tazminatı ──────────────────────────────────────────────────────────
 function ihbarGun(toplamAy: number): { gun: number; aciklama: string } {
   if (toplamAy < 6) return { gun: 14, aciklama: "6 aydan az → 2 hafta (14 gün)" };
-  if (toplamAy < 18) return { gun: 28, aciklama: "6 ay – 1,5 yıl → 4 hafta (28 gün)" };
-  if (toplamAy < 36) return { gun: 42, aciklama: "1,5 yıl – 3 yıl → 6 hafta (42 gün)" };
+  if (toplamAy <= 18) return { gun: 28, aciklama: "6 ay – 1,5 yıl → 4 hafta (28 gün)" };
+  if (toplamAy <= 36) return { gun: 42, aciklama: "1,5 yıl – 3 yıl → 6 hafta (42 gün)" };
   return { gun: 56, aciklama: "3 yıldan fazla → 8 hafta (56 gün)" };
 }
 
@@ -361,10 +361,11 @@ function FazlaMesaiCalc() {
 function netHesapla(brut: number): number {
   const sgk = brut * 0.15; // %15 SGK işçi payı (emeklilik %9 + sağlık %5 + işsizlik %1)
   const gvMatrah = brut - sgk;
-  // 2025 aylık gelir vergisi dilimleri
-  const d1 = 158000 / 12;
-  const d2 = 330000 / 12;
-  const d3 = 1200000 / 12;
+  // 2026 aylık gelir vergisi dilimleri (ücret gelirleri tarifesi)
+  const d1 = 190000 / 12;
+  const d2 = 400000 / 12;
+  const d3 = 1500000 / 12;
+  const d4 = 5300000 / 12;
   let gv: number;
   if (gvMatrah <= d1) {
     gv = gvMatrah * 0.15;
@@ -372,8 +373,15 @@ function netHesapla(brut: number): number {
     gv = d1 * 0.15 + (gvMatrah - d1) * 0.2;
   } else if (gvMatrah <= d3) {
     gv = d1 * 0.15 + (d2 - d1) * 0.2 + (gvMatrah - d2) * 0.27;
-  } else {
+  } else if (gvMatrah <= d4) {
     gv = d1 * 0.15 + (d2 - d1) * 0.2 + (d3 - d2) * 0.27 + (gvMatrah - d3) * 0.35;
+  } else {
+    gv =
+      d1 * 0.15 +
+      (d2 - d1) * 0.2 +
+      (d3 - d2) * 0.27 +
+      (d4 - d3) * 0.35 +
+      (gvMatrah - d4) * 0.4;
   }
   const dv = brut * 0.00759;
   return brut - sgk - gv - dv;
@@ -485,8 +493,9 @@ function MaasZammiCalc() {
             />
           </div>
           <p className="text-xs text-gray-400">
-            Net hesaplama tahminidir: SGK işçi %15 + 2025 gelir vergisi dilimleri
-            + damga vergisi %0,759
+            Net hesaplama tahminidir: SGK işçi %15 + 2026 gelir vergisi dilimleri
+            + damga vergisi %0,759 (asgari ücret istisnası ve kümülatif matrah
+            dikkate alınmaz)
           </p>
         </div>
       )}
@@ -510,7 +519,7 @@ function calcHizmet(baslangic: Date, bitis: Date) {
 function izinGunuHesapla(yil: number, yas: number | null): { gun: number; kural: string } {
   if (yas !== null && yas < 18) return { gun: 20, kural: "18 yaş altı — en az 20 iş günü" };
   if (yas !== null && yas >= 50) return { gun: 20, kural: "50 yaş ve üzeri — en az 20 iş günü" };
-  if (yil < 5)  return { gun: 14, kural: "1–5 yıl kıdem — 14 iş günü" };
+  if (yil <= 5) return { gun: 14, kural: "1–5 yıl kıdem (5 yıl dahil) — 14 iş günü" };
   if (yil < 15) return { gun: 20, kural: "5–15 yıl kıdem — 20 iş günü" };
   return { gun: 26, kural: "15 yıl ve üzeri kıdem — 26 iş günü" };
 }

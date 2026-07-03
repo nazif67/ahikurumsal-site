@@ -76,6 +76,7 @@ export default async function HaberDetailPage({
   try {
     yorumlar = await strapiGetAll<Yorum>("/yorumlar", {
       "filters[haber][slug][$eq]": params.slug,
+      "filters[approved][$eq]": "true",
       sort: "createdAt:desc",
     });
   } catch {
