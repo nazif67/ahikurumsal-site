@@ -19,7 +19,6 @@ export default async function DuyurularPage() {
   try {
     duyurular = await strapiGetAll<Duyuru>("/duyurular", {
       sort: "pinned:desc,date:desc",
-      fields: "title,slug,content,date,category,pinned,author,views",
     });
   } catch {
     duyurular = [];
