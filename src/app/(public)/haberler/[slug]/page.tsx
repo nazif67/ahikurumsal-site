@@ -90,7 +90,7 @@ export default async function HaberDetailPage({
       "filters[slug][$ne]": params.slug,
       "pagination[pageSize]": "10",
       sort: "date:desc",
-      fields: "title,slug,excerpt,date,category",
+      fields: "title,slug,excerpt,date,category,author",
     }).catch(() => []),
   ]);
 

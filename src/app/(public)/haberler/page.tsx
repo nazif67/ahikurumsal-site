@@ -18,7 +18,7 @@ export default async function HaberlerPage() {
   try {
     haberler = await strapiGetAll<Haber>("/haberler", {
       sort: "date:desc",
-      fields: "title,slug,excerpt,date,category,views",
+      fields: "title,slug,excerpt,date,category,author,views",
     });
   } catch {
     haberler = [];
