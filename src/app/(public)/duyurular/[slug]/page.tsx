@@ -73,7 +73,7 @@ export default async function DuyuruDetailPage({
     "filters[slug][$ne]": params.slug,
     "pagination[pageSize]": "10",
     sort: "pinned:desc,date:desc",
-    fields: "title,slug,content,date,category,author",
+    fields: "title,slug,content,date,category",
   }).catch(() => []);
 
   const related = [
