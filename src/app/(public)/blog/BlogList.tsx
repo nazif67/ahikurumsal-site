@@ -12,7 +12,7 @@ type Blog = {
   excerpt: string;
   date: string;
   category: string;
-  author: string;
+  author?: string;
   views: number;
 };
 

@@ -13,7 +13,7 @@ type Duyuru = {
   date: string;
   category: string;
   pinned: boolean;
-  author: string;
+  author?: string;
   views: number;
 };
 
