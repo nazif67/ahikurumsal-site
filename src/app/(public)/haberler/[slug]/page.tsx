@@ -45,9 +45,16 @@ export async function generateMetadata({
   try {
     const data = await strapiGetAll<Haber>("/haberler", {
       "filters[slug][$eq]": params.slug,
-      fields: "title",
+      fields: "title,excerpt",
     });
-    if (data.length > 0) return { title: data[0].title };
+    if (data.length > 0) {
+      const haber = data[0] as Haber & { id: number; documentId: string };
+      return {
+        title: haber.title,
+        description: haber.excerpt || undefined,
+        alternates: { canonical: `https://ahikurumsal.com/haberler/${params.slug}` },
+      };
+    }
   } catch {}
   return { title: "Haber bulunamadı" };
 }

@@ -35,9 +35,16 @@ export async function generateMetadata({
   try {
     const data = await strapiGetAll<Duyuru>("/duyurular", {
       "filters[slug][$eq]": params.slug,
-      fields: "title",
+      fields: "title,content",
     });
-    if (data.length > 0) return { title: data[0].title };
+    if (data.length > 0) {
+      const duyuru = data[0] as Duyuru & { id: number; documentId: string };
+      return {
+        title: duyuru.title,
+        description: duyuru.content ? duyuru.content.slice(0, 160) : undefined,
+        alternates: { canonical: `https://ahikurumsal.com/duyurular/${params.slug}` },
+      };
+    }
   } catch {}
   return { title: "Duyuru bulunamadı" };
 }

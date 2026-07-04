@@ -36,9 +36,16 @@ export async function generateMetadata({
   try {
     const data = await strapiGetAll<Blog>("/blogs", {
       "filters[slug][$eq]": params.slug,
-      fields: "title",
+      fields: "title,excerpt",
     });
-    if (data.length > 0) return { title: data[0].title };
+    if (data.length > 0) {
+      const post = data[0] as Blog & { id: number; documentId: string };
+      return {
+        title: post.title,
+        description: post.excerpt || undefined,
+        alternates: { canonical: `https://ahikurumsal.com/blog/${params.slug}` },
+      };
+    }
   } catch {}
   return { title: "Yazı bulunamadı" };
 }
