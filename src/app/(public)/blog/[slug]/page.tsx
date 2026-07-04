@@ -3,6 +3,7 @@ import Link from "next/link";
 import { strapiGetAll } from "@/lib/strapi";
 import { renderMarkdown } from "@/lib/markdown";
 import { ViewCounter } from "@/components/Views";
+import RelatedPosts from "@/components/RelatedPosts";
 
 export const revalidate = 60;
 
@@ -13,6 +14,7 @@ type Blog = {
   content: string;
   date: string;
   category: string;
+  author: string;
   views: number;
 };
 
@@ -69,7 +71,20 @@ export default async function BlogPostPage({
 
   if (!post) notFound();
 
-  const contentHtml = await renderMarkdown(post.content);
+  const [contentHtml, allOthers] = await Promise.all([
+    renderMarkdown(post.content),
+    strapiGetAll<Blog>("/blogs", {
+      "filters[slug][$ne]": params.slug,
+      "pagination[pageSize]": "10",
+      sort: "date:desc",
+      fields: "title,slug,excerpt,date,category,author",
+    }).catch(() => []),
+  ]);
+
+  const related = [
+    ...allOthers.filter((b) => b.category && b.category === post!.category),
+    ...allOthers.filter((b) => !b.category || b.category !== post!.category),
+  ].slice(0, 3);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
@@ -80,7 +95,7 @@ export default async function BlogPostPage({
         ← Blog&apos;a dön
       </Link>
 
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
         {post.date && <p className="text-sm text-gray-400">{post.date}</p>}
         {post.category && (
           <span className="text-xs bg-blue-50 text-blue-700 px-2 py-0.5 rounded-full">
@@ -94,6 +109,10 @@ export default async function BlogPostPage({
 
       <h1 className="text-3xl font-bold text-gray-900">{post.title}</h1>
 
+      {post.author && (
+        <p className="mt-2 text-sm text-gray-500">✍ {post.author}</p>
+      )}
+
       {post.excerpt && (
         <p className="mt-4 text-lg text-gray-500 border-l-4 border-brand pl-4 italic">
           {post.excerpt}
@@ -104,6 +123,8 @@ export default async function BlogPostPage({
         className="prose-content mt-8 text-gray-700"
         dangerouslySetInnerHTML={{ __html: contentHtml }}
       />
+
+      <RelatedPosts items={related} basePath="/blog" heading="Diğer Blog Yazıları" />
     </article>
   );
 }

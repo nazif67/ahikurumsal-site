@@ -12,6 +12,7 @@ type Blog = {
   excerpt: string;
   date: string;
   category: string;
+  author: string;
   views: number;
 };
 
@@ -44,7 +45,14 @@ export default function BlogList({ posts }: { posts: Blog[] }) {
           {post.excerpt && (
             <p className="mt-2 text-gray-500 line-clamp-2">{post.excerpt}</p>
           )}
-          <p className="mt-3 text-sm text-blue-600 font-medium">Devamını oku →</p>
+          <div className="mt-3 flex items-center justify-between">
+            {post.author ? (
+              <span className="text-xs text-gray-400">✍ {post.author}</span>
+            ) : (
+              <span />
+            )}
+            <span className="text-sm text-blue-600 font-medium">Devamını oku →</span>
+          </div>
         </Link>
       )}
     />

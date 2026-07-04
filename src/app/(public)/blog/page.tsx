@@ -18,7 +18,7 @@ export default async function BlogIndexPage() {
   try {
     posts = await strapiGetAll<Blog>("/blogs", {
       sort: "date:desc",
-      fields: "title,slug,excerpt,date,category,views",
+      fields: "title,slug,excerpt,date,category,author,views",
     });
   } catch {
     posts = [];

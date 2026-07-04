@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect, useRef, ReactNode } from "react";
+import { useState, useMemo, useEffect, ReactNode } from "react";
 
 type ContentListProps<T> = {
   items: T[];
@@ -11,7 +11,7 @@ type ContentListProps<T> = {
   getSearchText: (item: T) => string;
   getKey: (item: T) => string;
   renderItem: (item: T) => ReactNode;
-  batchSize?: number;
+  pageSize?: number;
 };
 
 export default function ContentList<T>({
@@ -23,12 +23,11 @@ export default function ContentList<T>({
   getSearchText,
   getKey,
   renderItem,
-  batchSize = 10,
+  pageSize = 10,
 }: ContentListProps<T>) {
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("Tümü");
-  const [visibleCount, setVisibleCount] = useState(batchSize);
-  const sentinelRef = useRef<HTMLDivElement>(null);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const categories = useMemo(() => {
     const cats = items.map(getCategory).filter(Boolean);
@@ -39,38 +38,32 @@ export default function ContentList<T>({
   const filtered = useMemo(() => {
     const q = search.toLowerCase();
     return items.filter((item) => {
-      const matchesSearch =
-        q === "" || getSearchText(item).toLowerCase().includes(q);
-      const matchesCategory =
-        activeCategory === "Tümü" || getCategory(item) === activeCategory;
+      const matchesSearch = q === "" || getSearchText(item).toLowerCase().includes(q);
+      const matchesCategory = activeCategory === "Tümü" || getCategory(item) === activeCategory;
       return matchesSearch && matchesCategory;
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [items, search, activeCategory]);
 
-  // Filtre değişince listeyi baştan göster
   useEffect(() => {
-    setVisibleCount(batchSize);
-  }, [search, activeCategory, batchSize]);
+    setCurrentPage(1);
+  }, [search, activeCategory]);
 
-  const visible = filtered.slice(0, visibleCount);
-  const hasMore = visibleCount < filtered.length;
+  const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+  const safePage = Math.min(currentPage, totalPages);
+  const visible = filtered.slice((safePage - 1) * pageSize, safePage * pageSize);
 
-  useEffect(() => {
-    if (!hasMore) return;
-    const el = sentinelRef.current;
-    if (!el) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisibleCount((c) => c + batchSize);
-        }
-      },
-      { rootMargin: "200px" }
-    );
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [hasMore, batchSize]);
+  function getPageNumbers(): (number | "...")[] {
+    if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+    const pages: (number | "...")[] = [1];
+    if (safePage > 3) pages.push("...");
+    for (let i = Math.max(2, safePage - 1); i <= Math.min(totalPages - 1, safePage + 1); i++) {
+      pages.push(i);
+    }
+    if (safePage < totalPages - 2) pages.push("...");
+    pages.push(totalPages);
+    return pages;
+  }
 
   return (
     <>
@@ -89,12 +82,7 @@ export default function ContentList<T>({
           stroke="currentColor"
           viewBox="0 0 24 24"
         >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
         </svg>
         {search && (
           <button
@@ -137,31 +125,51 @@ export default function ContentList<T>({
         ))}
       </div>
 
-      {/* Sonsuz kaydırma nöbetçisi */}
-      {hasMore && (
-        <div ref={sentinelRef} className="mt-6 flex justify-center py-4">
-          <span className="inline-flex items-center gap-2 text-sm text-gray-400">
-            <svg
-              className="h-4 w-4 animate-spin"
-              fill="none"
-              viewBox="0 0 24 24"
+      {/* Sayfalama */}
+      {totalPages > 1 && (
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <p className="text-sm text-gray-500">
+            {filtered.length} içerikten{" "}
+            <span className="font-medium text-gray-700">
+              {(safePage - 1) * pageSize + 1}–{Math.min(safePage * pageSize, filtered.length)}
+            </span>{" "}
+            arası gösteriliyor
+          </p>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+              disabled={safePage === 1}
+              className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
             >
-              <circle
-                className="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                strokeWidth="4"
-              />
-              <path
-                className="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-              />
-            </svg>
-            Yükleniyor...
-          </span>
+              ← Önceki
+            </button>
+            {getPageNumbers().map((page, i) =>
+              page === "..." ? (
+                <span key={`e-${i}`} className="px-2 text-gray-400 select-none">
+                  …
+                </span>
+              ) : (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page as number)}
+                  className={`w-9 h-9 text-sm rounded-lg border transition-colors ${
+                    safePage === page
+                      ? "bg-blue-600 text-white border-blue-600 font-semibold"
+                      : "border-gray-200 text-gray-600 hover:bg-gray-50"
+                  }`}
+                >
+                  {page}
+                </button>
+              )
+            )}
+            <button
+              onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+              disabled={safePage === totalPages}
+              className="px-3 py-1.5 text-sm rounded-lg border border-gray-200 text-gray-600 hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+            >
+              Sonraki →
+            </button>
+          </div>
         </div>
       )}
     </>

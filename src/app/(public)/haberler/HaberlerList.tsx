@@ -12,6 +12,7 @@ type Haber = {
   excerpt: string;
   date: string;
   category: string;
+  author: string;
   views: number;
 };
 
@@ -47,7 +48,14 @@ export default function HaberlerList({ haberler }: { haberler: Haber[] }) {
           {haber.excerpt && (
             <p className="mt-2 text-sm text-gray-500 line-clamp-2">{haber.excerpt}</p>
           )}
-          <p className="mt-3 text-sm text-blue-600 font-medium">Devamını oku →</p>
+          <div className="mt-3 flex items-center justify-between">
+            {haber.author ? (
+              <span className="text-xs text-gray-400">✍ {haber.author}</span>
+            ) : (
+              <span />
+            )}
+            <span className="text-sm text-blue-600 font-medium">Devamını oku →</span>
+          </div>
         </Link>
       )}
     />

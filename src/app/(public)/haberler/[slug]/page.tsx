@@ -4,6 +4,7 @@ import { strapiGetAll } from "@/lib/strapi";
 import { renderMarkdown } from "@/lib/markdown";
 import { ViewCounter } from "@/components/Views";
 import Comments from "./Comments";
+import RelatedPosts from "@/components/RelatedPosts";
 
 export const revalidate = 60;
 
@@ -14,6 +15,7 @@ type Haber = {
   content: string;
   date: string;
   category: string;
+  author: string;
   views: number;
 };
 
@@ -77,18 +79,25 @@ export default async function HaberDetailPage({
 
   if (!haber) notFound();
 
-  const contentHtml = await renderMarkdown(haber.content);
-
-  let yorumlar: Yorum[] = [];
-  try {
-    yorumlar = await strapiGetAll<Yorum>("/yorumlar", {
+  const [contentHtml, yorumlar, allOthers] = await Promise.all([
+    renderMarkdown(haber.content),
+    strapiGetAll<Yorum>("/yorumlar", {
       "filters[haber][slug][$eq]": params.slug,
       "filters[approved][$eq]": "true",
       sort: "createdAt:desc",
-    });
-  } catch {
-    yorumlar = [];
-  }
+    }).catch(() => []),
+    strapiGetAll<Haber>("/haberler", {
+      "filters[slug][$ne]": params.slug,
+      "pagination[pageSize]": "10",
+      sort: "date:desc",
+      fields: "title,slug,excerpt,date,category,author",
+    }).catch(() => []),
+  ]);
+
+  const related = [
+    ...allOthers.filter((h) => h.category && h.category === haber!.category),
+    ...allOthers.filter((h) => !h.category || h.category !== haber!.category),
+  ].slice(0, 3);
 
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
@@ -99,7 +108,7 @@ export default async function HaberDetailPage({
         ← Haberlere dön
       </Link>
 
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex flex-wrap items-center gap-2 mb-2">
         {haber.date && <p className="text-sm text-gray-400">{haber.date}</p>}
         {haber.category && (
           <span className="text-xs bg-green-50 text-green-700 px-2 py-0.5 rounded-full">
@@ -113,6 +122,10 @@ export default async function HaberDetailPage({
 
       <h1 className="text-3xl font-bold text-gray-900">{haber.title}</h1>
 
+      {haber.author && (
+        <p className="mt-2 text-sm text-gray-500">✍ {haber.author}</p>
+      )}
+
       {haber.excerpt && (
         <p className="mt-4 text-lg text-gray-500 border-l-4 border-brand pl-4 italic">
           {haber.excerpt}
@@ -125,6 +138,8 @@ export default async function HaberDetailPage({
       />
 
       <Comments haberId={haber.id} yorumlar={yorumlar} />
+
+      <RelatedPosts items={related} basePath="/haberler" heading="Diğer Haberler" />
     </article>
   );
 }
