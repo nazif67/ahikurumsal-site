@@ -11,6 +11,7 @@ const NAV_LINKS = [
   { href: "/haberler", label: "Haberler" },
   { href: "/hazir-sablonlar", label: "Hazır Şablonlar" },
   { href: "/araclar", label: "Araçlar" },
+  { href: "/sss", label: "SSS" },
   { href: "/hakkimda", label: "Hakkımda" },
   { href: "/iletisim", label: "İletişim" },
 ];
