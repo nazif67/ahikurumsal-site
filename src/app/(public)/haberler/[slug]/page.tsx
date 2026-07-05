@@ -5,6 +5,7 @@ import { renderMarkdown } from "@/lib/markdown";
 import { ViewCounter } from "@/components/Views";
 import Comments from "./Comments";
 import RelatedPosts from "@/components/RelatedPosts";
+import PaylasButonlari from "@/components/PaylasButonlari";
 
 export const revalidate = 60;
 
@@ -51,10 +52,20 @@ export async function generateMetadata({
     });
     if (data.length > 0) {
       const haber = data[0] as Haber & { id: number; documentId: string };
+      const url = `https://ahikurumsal.com/haberler/${params.slug}`;
       return {
         title: haber.title,
         description: haber.excerpt || undefined,
-        alternates: { canonical: `https://ahikurumsal.com/haberler/${params.slug}` },
+        alternates: { canonical: url },
+        openGraph: {
+          title: haber.title,
+          description: haber.excerpt || undefined,
+          url,
+          type: "article",
+          siteName: "Ahikurumsal",
+          locale: "tr_TR",
+        },
+        twitter: { card: "summary_large_image", title: haber.title, description: haber.excerpt || undefined },
       };
     }
   } catch {}
@@ -135,6 +146,11 @@ export default async function HaberDetailPage({
       <div
         className="prose-content mt-8 text-gray-700"
         dangerouslySetInnerHTML={{ __html: contentHtml }}
+      />
+
+      <PaylasButonlari
+        url={`https://ahikurumsal.com/haberler/${haber.slug}`}
+        baslik={haber.title}
       />
 
       <Comments haberId={haber.id} yorumlar={yorumlar} />

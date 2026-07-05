@@ -3,6 +3,7 @@ import Link from "next/link";
 import { strapiGetAll } from "@/lib/strapi";
 import { ViewCounter } from "@/components/Views";
 import RelatedPosts from "@/components/RelatedPosts";
+import PaylasButonlari from "@/components/PaylasButonlari";
 
 export const revalidate = 60;
 
@@ -41,10 +42,21 @@ export async function generateMetadata({
     });
     if (data.length > 0) {
       const duyuru = data[0] as Duyuru & { id: number; documentId: string };
+      const aciklama = duyuru.content ? duyuru.content.slice(0, 160) : undefined;
+      const url = `https://ahikurumsal.com/duyurular/${params.slug}`;
       return {
         title: duyuru.title,
-        description: duyuru.content ? duyuru.content.slice(0, 160) : undefined,
-        alternates: { canonical: `https://ahikurumsal.com/duyurular/${params.slug}` },
+        description: aciklama,
+        alternates: { canonical: url },
+        openGraph: {
+          title: duyuru.title,
+          description: aciklama,
+          url,
+          type: "article",
+          siteName: "Ahikurumsal",
+          locale: "tr_TR",
+        },
+        twitter: { card: "summary_large_image", title: duyuru.title, description: aciklama },
       };
     }
   } catch {}
@@ -127,6 +139,11 @@ export default async function DuyuruDetailPage({
           {duyuru.content}
         </div>
       )}
+
+      <PaylasButonlari
+        url={`https://ahikurumsal.com/duyurular/${duyuru.slug}`}
+        baslik={duyuru.title}
+      />
 
       <RelatedPosts items={relatedItems} basePath="/duyurular" heading="Diğer Duyurular" />
     </article>

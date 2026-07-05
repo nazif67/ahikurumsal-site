@@ -1,4 +1,5 @@
 import HesaplamaAraclari from "@/components/HesaplamaAraclari";
+import AraclarSeoIcerik from "@/components/AraclarSeoIcerik";
 import { strapiGetSingle } from "@/lib/strapi";
 import {
   mergeMaasParams,
@@ -6,7 +7,34 @@ import {
 } from "@/lib/maasParametreleri";
 
 export const revalidate = 3600;
-export const metadata = { title: "Hesaplama Araçları" };
+
+const ARAC_ACIKLAMA =
+  "2026 güncel mevzuatına göre ücretsiz hesaplama araçları: brütten nete ve netten brüte maaş, kıdem tazminatı, ihbar tazminatı, fazla mesai, maaş zammı ve yıllık izin hesaplama.";
+
+export const metadata = {
+  title: "Hesaplama Araçları | Brütten Nete Maaş, Kıdem & İhbar Tazminatı",
+  description: ARAC_ACIKLAMA,
+  keywords: [
+    "brütten nete maaş hesaplama",
+    "netten brüte maaş hesaplama",
+    "kıdem tazminatı hesaplama",
+    "ihbar tazminatı hesaplama",
+    "fazla mesai hesaplama",
+    "yıllık izin hesaplama",
+    "maaş zammı hesaplama",
+    "işveren maliyeti hesaplama",
+    "2026 bordro hesaplama",
+  ],
+  alternates: { canonical: "https://ahikurumsal.com/araclar" },
+  openGraph: {
+    title: "Hesaplama Araçları | Ahikurumsal",
+    description: ARAC_ACIKLAMA,
+    url: "https://ahikurumsal.com/araclar",
+    type: "website",
+    siteName: "Ahikurumsal",
+    locale: "tr_TR",
+  },
+};
 
 const VARSAYILAN_TAVAN = 47228.43;
 
@@ -58,6 +86,8 @@ export default async function AraclarPage() {
         tavanTarihi={tavanTarihi}
         maasParams={maasParams}
       />
+
+      <AraclarSeoIcerik />
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { strapiGetAll } from "@/lib/strapi";
 import { renderMarkdown } from "@/lib/markdown";
 import { ViewCounter } from "@/components/Views";
 import RelatedPosts from "@/components/RelatedPosts";
+import PaylasButonlari from "@/components/PaylasButonlari";
 
 export const revalidate = 60;
 
@@ -42,10 +43,20 @@ export async function generateMetadata({
     });
     if (data.length > 0) {
       const post = data[0] as Blog & { id: number; documentId: string };
+      const url = `https://ahikurumsal.com/blog/${params.slug}`;
       return {
         title: post.title,
         description: post.excerpt || undefined,
-        alternates: { canonical: `https://ahikurumsal.com/blog/${params.slug}` },
+        alternates: { canonical: url },
+        openGraph: {
+          title: post.title,
+          description: post.excerpt || undefined,
+          url,
+          type: "article",
+          siteName: "Ahikurumsal",
+          locale: "tr_TR",
+        },
+        twitter: { card: "summary_large_image", title: post.title, description: post.excerpt || undefined },
       };
     }
   } catch {}
@@ -122,6 +133,11 @@ export default async function BlogPostPage({
       <div
         className="prose-content mt-8 text-gray-700"
         dangerouslySetInnerHTML={{ __html: contentHtml }}
+      />
+
+      <PaylasButonlari
+        url={`https://ahikurumsal.com/blog/${post.slug}`}
+        baslik={post.title}
       />
 
       <RelatedPosts items={related} basePath="/blog" heading="Diğer Blog Yazıları" />
