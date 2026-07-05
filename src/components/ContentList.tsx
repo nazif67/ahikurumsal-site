@@ -10,7 +10,8 @@ type ContentListProps<T> = {
   getCategory: (item: T) => string;
   getSearchText: (item: T) => string;
   getKey: (item: T) => string;
-  renderItem: (item: T) => ReactNode;
+  renderItem?: (item: T) => ReactNode;
+  renderItems?: (items: T[]) => ReactNode;
   pageSize?: number;
 };
 
@@ -23,6 +24,7 @@ export default function ContentList<T>({
   getSearchText,
   getKey,
   renderItem,
+  renderItems,
   pageSize = 10,
 }: ContentListProps<T>) {
   const [search, setSearch] = useState("");
@@ -120,9 +122,11 @@ export default function ContentList<T>({
             <p className="text-gray-500">{emptyMessage}</p>
           </div>
         )}
-        {visible.map((item) => (
-          <div key={getKey(item)}>{renderItem(item)}</div>
-        ))}
+        {filtered.length > 0 && renderItems
+          ? renderItems(visible)
+          : visible.map((item) => (
+              <div key={getKey(item)}>{renderItem?.(item)}</div>
+            ))}
       </div>
 
       {/* Sayfalama */}
