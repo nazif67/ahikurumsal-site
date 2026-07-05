@@ -6,9 +6,9 @@ import { useState, useEffect } from "react";
 
 const NAV_LINKS = [
   { href: "/", label: "Ana Sayfa" },
-  { href: "/duyurular", label: "Duyurular" },
-  { href: "/blog", label: "Blog" },
   { href: "/haberler", label: "Haberler" },
+  { href: "/blog", label: "Blog" },
+  { href: "/duyurular", label: "Duyurular" },
   { href: "/hazir-sablonlar", label: "Hazır Şablonlar" },
   { href: "/araclar", label: "Araçlar" },
   { href: "/sss", label: "SSS" },
