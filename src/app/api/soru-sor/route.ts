@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
+import { strapiPost } from "@/lib/strapi";
 
 export async function POST(req: NextRequest) {
   const { name, email, phone, question } = await req.json();
@@ -11,6 +12,18 @@ export async function POST(req: NextRequest) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return NextResponse.json({ error: "Geçersiz e-posta adresi." }, { status: 400 });
+  }
+
+  // Strapi'ye kaydet
+  try {
+    await strapiPost("/iletisim-mesajlaris", {
+      ad: name,
+      email,
+      konu: phone ? `Soru (Tel: ${phone})` : "Ziyaretçi Sorusu",
+      mesaj: question,
+    });
+  } catch (err) {
+    console.error("Strapi kayıt hatası:", err);
   }
 
   const GMAIL_USER = process.env.GMAIL_USER;
