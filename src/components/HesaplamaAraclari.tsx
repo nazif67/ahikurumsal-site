@@ -691,12 +691,42 @@ export default function HesaplamaAraclari({
   kidemTavani,
   tavanTarihi,
   maasParams,
+  soloArac,
 }: {
   kidemTavani: number;
   tavanTarihi: string | null;
   maasParams?: MaasParametreleri;
+  soloArac?: string;
 }) {
-  const [activeTab, setActiveTab] = useState("maasHesap");
+  const [activeTab, setActiveTab] = useState(soloArac ?? "maasHesap");
+
+  function renderArac(id: string) {
+    switch (id) {
+      case "maasHesap":
+        return <MaasHesaplama params={maasParams} />;
+      case "kidem":
+        return <KidemCalc tavan={kidemTavani} tavanTarihi={tavanTarihi} />;
+      case "ihbar":
+        return <IhbarCalc />;
+      case "fazlaMesai":
+        return <FazlaMesaiCalc />;
+      case "maasZammi":
+        return <MaasZammiCalc />;
+      case "yillikIzin":
+        return <YillikIzinCalc />;
+      default:
+        return null;
+    }
+  }
+
+  // Tek araç modu (araca özel /araclar/[slug] sayfaları) — sekme çubuğu yok
+  if (soloArac) {
+    return (
+      <div className="bg-white rounded-xl border border-gray-200 p-6">
+        {renderArac(soloArac)}
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -720,12 +750,7 @@ export default function HesaplamaAraclari({
         <h2 className="text-lg font-semibold text-gray-900 mb-5">
           {TAB_LABELS[activeTab]}
         </h2>
-        {activeTab === "maasHesap" && <MaasHesaplama params={maasParams} />}
-        {activeTab === "kidem" && <KidemCalc tavan={kidemTavani} tavanTarihi={tavanTarihi} />}
-        {activeTab === "ihbar" && <IhbarCalc />}
-        {activeTab === "fazlaMesai" && <FazlaMesaiCalc />}
-        {activeTab === "maasZammi" && <MaasZammiCalc />}
-        {activeTab === "yillikIzin" && <YillikIzinCalc />}
+        {renderArac(activeTab)}
       </div>
     </div>
   );

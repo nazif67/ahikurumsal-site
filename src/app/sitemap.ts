@@ -1,5 +1,6 @@
 import { MetadataRoute } from "next";
 import { strapiGetAll } from "@/lib/strapi";
+import { ARACLAR } from "@/lib/araclarData";
 
 const BASE_URL = "https://ahikurumsal.com";
 
@@ -10,11 +11,17 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { url: `${BASE_URL}/duyurular`, priority: 0.8, changeFrequency: "weekly" },
     { url: `${BASE_URL}/haberler`, priority: 0.8, changeFrequency: "weekly" },
     { url: `${BASE_URL}/hazir-sablonlar`, priority: 0.7, changeFrequency: "monthly" },
-    { url: `${BASE_URL}/araclar`, priority: 0.7, changeFrequency: "monthly" },
+    { url: `${BASE_URL}/araclar`, priority: 0.8, changeFrequency: "monthly" },
     { url: `${BASE_URL}/sss`, priority: 0.7, changeFrequency: "monthly" },
     { url: `${BASE_URL}/hakkimda`, priority: 0.6, changeFrequency: "monthly" },
     { url: `${BASE_URL}/iletisim`, priority: 0.5, changeFrequency: "yearly" },
   ];
+
+  const aracPages: MetadataRoute.Sitemap = ARACLAR.map((a) => ({
+    url: `${BASE_URL}/araclar/${a.slug}`,
+    priority: 0.8,
+    changeFrequency: "monthly",
+  }));
 
   type WithSlug = { slug: string; updatedAt?: string };
 
@@ -51,5 +58,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "monthly",
     }));
 
-  return [...staticPages, ...blogPages, ...duyuruPages, ...haberPages];
+  return [...staticPages, ...aracPages, ...blogPages, ...duyuruPages, ...haberPages];
 }

@@ -1,10 +1,6 @@
 import HesaplamaAraclari from "@/components/HesaplamaAraclari";
-import AraclarSeoIcerik from "@/components/AraclarSeoIcerik";
-import { strapiGetSingle } from "@/lib/strapi";
-import {
-  mergeMaasParams,
-  type MaasParamStrapi,
-} from "@/lib/maasParametreleri";
+import AracKartlari from "@/components/AracKartlari";
+import { getAraclarVeri } from "@/lib/araclarVeri";
 
 export const revalidate = 3600;
 
@@ -36,32 +32,8 @@ export const metadata = {
   },
 };
 
-const VARSAYILAN_TAVAN = 47228.43;
-
 export default async function AraclarPage() {
-  let kidemTavani = VARSAYILAN_TAVAN;
-  let tavanTarihi: string | null = null;
-  try {
-    const data = await strapiGetSingle<{ tutar: number; gecerlilik_tarihi: string | null }>(
-      "/kidem-tavan"
-    );
-    if (data?.tutar) {
-      kidemTavani = data.tutar;
-      tavanTarihi = data.gecerlilik_tarihi ?? null;
-    }
-  } catch {
-    // Strapi'den çekilemezse varsayılan değer kullanılır
-  }
-
-  // Maaş hesaplama parametreleri — Strapi'de doldurulan alanlar varsayılanların
-  // üzerine yazılır; erişilemezse koddaki güncel değerler kullanılır.
-  let maasParams = mergeMaasParams(null);
-  try {
-    const mp = await strapiGetSingle<MaasParamStrapi>("/maas-parametre");
-    maasParams = mergeMaasParams(mp);
-  } catch {
-    // Strapi'den çekilemezse varsayılan parametreler kullanılır
-  }
+  const { kidemTavani, tavanTarihi, maasParams } = await getAraclarVeri();
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-16">
@@ -87,7 +59,7 @@ export default async function AraclarPage() {
         maasParams={maasParams}
       />
 
-      <AraclarSeoIcerik />
+      <AracKartlari baslik="Araca Özel Sayfalar" />
     </div>
   );
 }
