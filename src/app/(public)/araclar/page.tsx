@@ -1,5 +1,9 @@
 import HesaplamaAraclari from "@/components/HesaplamaAraclari";
 import { strapiGetSingle } from "@/lib/strapi";
+import {
+  mergeMaasParams,
+  type MaasParamStrapi,
+} from "@/lib/maasParametreleri";
 
 export const revalidate = 3600;
 export const metadata = { title: "Hesaplama Araçları" };
@@ -21,12 +25,22 @@ export default async function AraclarPage() {
     // Strapi'den çekilemezse varsayılan değer kullanılır
   }
 
+  // Maaş hesaplama parametreleri — Strapi'de doldurulan alanlar varsayılanların
+  // üzerine yazılır; erişilemezse koddaki güncel değerler kullanılır.
+  let maasParams = mergeMaasParams(null);
+  try {
+    const mp = await strapiGetSingle<MaasParamStrapi>("/maas-parametre");
+    maasParams = mergeMaasParams(mp);
+  } catch {
+    // Strapi'den çekilemezse varsayılan parametreler kullanılır
+  }
+
   return (
     <div className="mx-auto max-w-4xl px-4 sm:px-6 py-16">
       <h1 className="text-3xl font-bold text-gray-900">Hesaplama Araçları</h1>
       <p className="mt-2 text-gray-500 mb-8">
-        Kıdem tazminatı, ihbar tazminatı, fazla mesai ve maaş zammı
-        hesaplamaları. Sonuçlar bilgi amaçlıdır.
+        Brütten nete / netten brüte maaş, kıdem tazminatı, ihbar tazminatı,
+        fazla mesai ve maaş zammı hesaplamaları. Sonuçlar bilgi amaçlıdır.
       </p>
       <div className="flex gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-6 text-sm text-amber-800">
         <span className="text-amber-500 text-base leading-snug flex-shrink-0">⚠</span>
@@ -37,7 +51,11 @@ export default async function AraclarPage() {
         </p>
       </div>
 
-      <HesaplamaAraclari kidemTavani={kidemTavani} tavanTarihi={tavanTarihi} />
+      <HesaplamaAraclari
+        kidemTavani={kidemTavani}
+        tavanTarihi={tavanTarihi}
+        maasParams={maasParams}
+      />
     </div>
   );
 }

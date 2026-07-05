@@ -674,9 +674,12 @@ function YillikIzinCalc() {
 
 // ─── Tab wrapper ───────────────────────────────────────────────────────────────
 import React from "react";
+import MaasHesaplama from "./MaasHesaplama";
+import type { MaasParametreleri } from "@/lib/maasParametreleri";
 
-const TAB_IDS = ["kidem", "ihbar", "fazlaMesai", "maasZammi", "yillikIzin"] as const;
+const TAB_IDS = ["maasHesap", "kidem", "ihbar", "fazlaMesai", "maasZammi", "yillikIzin"] as const;
 const TAB_LABELS: Record<string, string> = {
+  maasHesap: "Brüt ↔ Net Maaş",
   kidem: "Kıdem Tazminatı",
   ihbar: "İhbar Tazminatı",
   fazlaMesai: "Fazla Mesai",
@@ -687,11 +690,13 @@ const TAB_LABELS: Record<string, string> = {
 export default function HesaplamaAraclari({
   kidemTavani,
   tavanTarihi,
+  maasParams,
 }: {
   kidemTavani: number;
   tavanTarihi: string | null;
+  maasParams?: MaasParametreleri;
 }) {
-  const [activeTab, setActiveTab] = useState("kidem");
+  const [activeTab, setActiveTab] = useState("maasHesap");
 
   return (
     <div>
@@ -715,6 +720,7 @@ export default function HesaplamaAraclari({
         <h2 className="text-lg font-semibold text-gray-900 mb-5">
           {TAB_LABELS[activeTab]}
         </h2>
+        {activeTab === "maasHesap" && <MaasHesaplama params={maasParams} />}
         {activeTab === "kidem" && <KidemCalc tavan={kidemTavani} tavanTarihi={tavanTarihi} />}
         {activeTab === "ihbar" && <IhbarCalc />}
         {activeTab === "fazlaMesai" && <FazlaMesaiCalc />}

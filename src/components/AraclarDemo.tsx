@@ -10,7 +10,7 @@ function fmt(n: number) {
   });
 }
 
-const DIGER_ARACLAR = ["İhbar Tazminatı", "Fazla Mesai", "Maaş Zammı", "Yıllık İzin"];
+const DIGER_ARACLAR = ["Brüt ↔ Net Maaş", "İhbar Tazminatı", "Fazla Mesai", "Maaş Zammı", "Yıllık İzin"];
 
 export default function AraclarDemo({
   kidemTavani,
