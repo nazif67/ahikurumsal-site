@@ -63,21 +63,21 @@ type AySonuc = {
 type Kolon = { key: keyof AySonuc; label: string; vurgu?: boolean; noToplam?: boolean };
 const KOLONLAR: Kolon[] = [
   { key: "brut", label: "Brüt" },
-  { key: "sgkIsci", label: "SGK İşçi (%14)" },
-  { key: "issizlikIsci", label: "İşsizlik İşçi (%1)" },
+  { key: "sgkIsci", label: "SGK İşçi" },
+  { key: "issizlikIsci", label: "İşsizlik" },
   { key: "engellilikIndirimi", label: "Engellilik İnd." },
   { key: "matrah", label: "GV Matrahı" },
-  { key: "kumMatrah", label: "Kümülatif Matrah", noToplam: true },
-  { key: "gvHesaplanan", label: "Hesaplanan GV" },
-  { key: "gvIstisna", label: "Asg.Ü. GV İstisnası" },
+  { key: "kumMatrah", label: "Küm. Matrah", noToplam: true },
+  { key: "gvHesaplanan", label: "Hesap. GV" },
+  { key: "gvIstisna", label: "GV İstisnası" },
   { key: "gelirVergisi", label: "Ödenecek GV" },
-  { key: "damgaHesaplanan", label: "Hesaplanan Damga" },
-  { key: "damgaIstisna", label: "Asg.Ü. Damga İstisnası" },
+  { key: "damgaHesaplanan", label: "Hesap. Damga" },
+  { key: "damgaIstisna", label: "Damga İstisnası" },
   { key: "damga", label: "Ödenecek Damga" },
-  { key: "net", label: "Net Ele Geçen", vurgu: true },
+  { key: "net", label: "Net", vurgu: true },
   { key: "sgkIsveren", label: "SGK İşveren" },
-  { key: "issizlikIsveren", label: "İşsizlik İşveren" },
-  { key: "isverenMaliyeti", label: "Toplam İşveren Maliyeti", vurgu: true },
+  { key: "issizlikIsveren", label: "İşsizlik İşv." },
+  { key: "isverenMaliyeti", label: "Toplam Maliyet", vurgu: true },
 ];
 
 /* ─── Bileşen ──────────────────────────────────────────────────────────────── */
@@ -293,7 +293,8 @@ export default function MaasHesaplama({
   const tutarLabel = mode === "brutten" ? "Brüt" : "Net";
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6">
+      <div className="max-w-4xl space-y-5">
       <p className="text-sm text-gray-500">
         {P.yil} güncel mevzuatına göre brütten nete / netten brüte 12 aylık maaş
         ve işveren maliyeti hesaplaması. Gelir vergisi{" "}
@@ -442,6 +443,7 @@ export default function MaasHesaplama({
           <p>{hata}</p>
         </div>
       )}
+      </div>
 
       {rows && toplam && (
         <div className="space-y-3">
@@ -462,16 +464,16 @@ export default function MaasHesaplama({
           </div>
 
           <div className="overflow-x-auto rounded-xl border border-gray-200">
-            <table className="w-full text-xs min-w-[1500px]">
+            <table className="w-full text-[11px] sm:text-xs min-w-[640px]">
               <thead>
-                <tr className="bg-gray-50 text-gray-500 uppercase tracking-wide">
-                  <th className="text-left font-medium px-2.5 py-2.5 sticky left-0 bg-gray-50 z-10">
+                <tr className="bg-gray-50 text-gray-500 tracking-tight align-bottom">
+                  <th className="text-left font-medium px-2 py-2 sticky left-0 bg-gray-50 z-10">
                     Ay
                   </th>
                   {KOLONLAR.map((k) => (
                     <th
                       key={k.key}
-                      className={`text-right font-medium px-2.5 py-2.5 whitespace-nowrap ${
+                      className={`text-right font-medium px-2 py-2 leading-tight ${
                         k.vurgu ? "text-blue-700" : ""
                       }`}
                     >
@@ -483,13 +485,13 @@ export default function MaasHesaplama({
               <tbody className="divide-y divide-gray-100">
                 {rows.map((r) => (
                   <tr key={r.ay} className="hover:bg-gray-50/60">
-                    <td className="px-2.5 py-2 text-gray-700 font-medium sticky left-0 bg-white z-10">
+                    <td className="px-2 py-1.5 text-gray-700 font-medium sticky left-0 bg-white z-10">
                       {r.ay}
                     </td>
                     {KOLONLAR.map((k) => (
                       <td
                         key={k.key}
-                        className={`px-2.5 py-2 text-right whitespace-nowrap ${
+                        className={`px-2 py-1.5 text-right whitespace-nowrap tabular-nums ${
                           k.vurgu
                             ? "font-semibold text-blue-700"
                             : "text-gray-600"
@@ -503,13 +505,13 @@ export default function MaasHesaplama({
               </tbody>
               <tfoot>
                 <tr className="bg-blue-50/60 font-semibold text-gray-800 border-t-2 border-blue-100">
-                  <td className="px-2.5 py-2.5 sticky left-0 bg-blue-50 z-10">
-                    Yıllık Toplam
+                  <td className="px-2 py-2 sticky left-0 bg-blue-50 z-10">
+                    Toplam
                   </td>
                   {KOLONLAR.map((k) => (
                     <td
                       key={k.key}
-                      className={`px-2.5 py-2.5 text-right whitespace-nowrap ${
+                      className={`px-2 py-2 text-right whitespace-nowrap tabular-nums ${
                         k.vurgu ? "text-blue-700" : ""
                       }`}
                     >
