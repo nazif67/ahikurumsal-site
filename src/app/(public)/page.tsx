@@ -152,16 +152,16 @@ export default async function HomePage() {
               </p>
               <div className="mt-8 flex flex-wrap gap-3">
                 <Link
-                  href="/araclar"
+                  href="/haberler"
                   className="rounded-lg bg-white px-5 py-2.5 font-semibold text-brand hover:bg-blue-50 transition-colors text-sm"
                 >
-                  Hesaplama Araçları
+                  Haberler
                 </Link>
                 <Link
-                  href="/iletisim"
+                  href="/araclar"
                   className="rounded-lg border border-white/40 bg-white/10 px-5 py-2.5 font-semibold text-white hover:bg-white/20 transition-colors text-sm"
                 >
-                  İletişime Geç
+                  Hesaplama Araçları
                 </Link>
                 <Link
                   href="/blog"
@@ -170,10 +170,10 @@ export default async function HomePage() {
                   Blog
                 </Link>
                 <Link
-                  href="/haberler"
+                  href="/iletisim"
                   className="rounded-lg border border-white/30 px-5 py-2.5 font-semibold text-white/80 hover:text-white hover:border-white/50 transition-colors text-sm"
                 >
-                  Haberler
+                  İletişime Geç
                 </Link>
               </div>
             </div>
