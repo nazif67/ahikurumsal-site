@@ -40,15 +40,45 @@ type Opts = {
 
 type AySonuc = {
   brut: number;
-  sgkKesinti: number; // SGK işçi + işsizlik (%15)
-  matrah: number;
-  gelirVergisi: number;
-  damga: number;
-  net: number;
-  isverenMaliyeti: number;
-  kumMatrah: number;
+  sgkIsci: number; // SGK işçi payı (%14)
+  issizlikIsci: number; // işsizlik işçi payı (%1)
+  engellilikIndirimi: number; // aylık engellilik indirimi
+  matrah: number; // aylık gelir vergisi matrahı
+  kumMatrah: number; // kümülatif gelir vergisi matrahı
+  gvHesaplanan: number; // istisnadan önce hesaplanan gelir vergisi
+  gvIstisna: number; // asgari ücret gelir vergisi istisnası
+  gelirVergisi: number; // ödenecek gelir vergisi (istisnadan sonra)
+  damgaHesaplanan: number; // hesaplanan damga vergisi
+  damgaIstisna: number; // asgari ücret damga vergisi istisnası
+  damga: number; // ödenecek damga vergisi
+  net: number; // net ele geçen
+  sgkIsveren: number; // SGK işveren payı
+  issizlikIsveren: number; // işsizlik işveren payı
+  isverenMaliyeti: number; // toplam işveren maliyeti
   kumAsgari: number;
 };
+
+// Detaylı tablo + Excel dışa aktarma için ortak kolon tanımı.
+// noToplam: yıllık toplam satırında toplanmaz (kümülatif değer).
+type Kolon = { key: keyof AySonuc; label: string; vurgu?: boolean; noToplam?: boolean };
+const KOLONLAR: Kolon[] = [
+  { key: "brut", label: "Brüt" },
+  { key: "sgkIsci", label: "SGK İşçi (%14)" },
+  { key: "issizlikIsci", label: "İşsizlik İşçi (%1)" },
+  { key: "engellilikIndirimi", label: "Engellilik İnd." },
+  { key: "matrah", label: "GV Matrahı" },
+  { key: "kumMatrah", label: "Kümülatif Matrah", noToplam: true },
+  { key: "gvHesaplanan", label: "Hesaplanan GV" },
+  { key: "gvIstisna", label: "Asg.Ü. GV İstisnası" },
+  { key: "gelirVergisi", label: "Ödenecek GV" },
+  { key: "damgaHesaplanan", label: "Hesaplanan Damga" },
+  { key: "damgaIstisna", label: "Asg.Ü. Damga İstisnası" },
+  { key: "damga", label: "Ödenecek Damga" },
+  { key: "net", label: "Net Ele Geçen", vurgu: true },
+  { key: "sgkIsveren", label: "SGK İşveren" },
+  { key: "issizlikIsveren", label: "İşsizlik İşveren" },
+  { key: "isverenMaliyeti", label: "Toplam İşveren Maliyeti", vurgu: true },
+];
 
 /* ─── Bileşen ──────────────────────────────────────────────────────────────── */
 
@@ -90,22 +120,25 @@ export default function MaasHesaplama({
     if (matrah < 0) matrah = 0;
 
     const kumMatrahSonra = kumMatrahOnce + matrah;
-    const gvToplam = gelirVergisi(kumMatrahSonra) - gelirVergisi(kumMatrahOnce);
+    const gvHesaplanan = gelirVergisi(kumMatrahSonra) - gelirVergisi(kumMatrahOnce);
 
     // Asgari ücret gelir vergisi istisnası (kümülatif)
-    let istisnaGV = 0;
+    let gvIstisna = 0;
     let kumAsgariSonra = kumAsgariOnce;
     if (opts.istisna) {
       const asgariMatrahAy = P.asgariBrut * (1 - P.sgkIsci - P.issizlikIsci);
       kumAsgariSonra = kumAsgariOnce + asgariMatrahAy;
-      istisnaGV = gelirVergisi(kumAsgariSonra) - gelirVergisi(kumAsgariOnce);
+      gvIstisna = gelirVergisi(kumAsgariSonra) - gelirVergisi(kumAsgariOnce);
     }
-    const gvOdenecek = Math.max(0, gvToplam - istisnaGV);
+    // İstisna, hesaplanan vergiden fazla olamaz
+    gvIstisna = Math.min(gvIstisna, gvHesaplanan);
+    const gvOdenecek = gvHesaplanan - gvIstisna;
 
     // Damga vergisi (asgari ücrete isabet eden kısım istisna)
-    const damgaBrut = brut * P.damga;
-    const damgaIstisna = opts.istisna ? P.asgariBrut * P.damga : 0;
-    const damgaOdenecek = Math.max(0, damgaBrut - damgaIstisna);
+    const damgaHesaplanan = brut * P.damga;
+    let damgaIstisna = opts.istisna ? P.asgariBrut * P.damga : 0;
+    damgaIstisna = Math.min(damgaIstisna, damgaHesaplanan);
+    const damgaOdenecek = damgaHesaplanan - damgaIstisna;
 
     const net = brut - sgkKesinti - gvOdenecek - damgaOdenecek;
 
@@ -115,13 +148,21 @@ export default function MaasHesaplama({
 
     return {
       brut,
-      sgkKesinti,
+      sgkIsci,
+      issizlikIsci,
+      engellilikIndirimi: engIndirim,
       matrah,
+      kumMatrah: kumMatrahSonra,
+      gvHesaplanan,
+      gvIstisna,
       gelirVergisi: gvOdenecek,
+      damgaHesaplanan,
+      damgaIstisna,
       damga: damgaOdenecek,
       net,
+      sgkIsveren,
+      issizlikIsveren,
       isverenMaliyeti,
-      kumMatrah: kumMatrahSonra,
       kumAsgari: kumAsgariSonra,
     };
   }
@@ -213,18 +254,41 @@ export default function MaasHesaplama({
   }
 
   const toplam = rows
-    ? rows.reduce(
-        (acc, r) => ({
-          brut: acc.brut + r.brut,
-          sgkKesinti: acc.sgkKesinti + r.sgkKesinti,
-          gelirVergisi: acc.gelirVergisi + r.gelirVergisi,
-          damga: acc.damga + r.damga,
-          net: acc.net + r.net,
-          isverenMaliyeti: acc.isverenMaliyeti + r.isverenMaliyeti,
-        }),
-        { brut: 0, sgkKesinti: 0, gelirVergisi: 0, damga: 0, net: 0, isverenMaliyeti: 0 }
-      )
+    ? (() => {
+        const t = {} as Record<keyof AySonuc, number>;
+        for (const k of KOLONLAR) {
+          if (k.noToplam) continue;
+          t[k.key] = rows.reduce((s, r) => s + (r[k.key] as number), 0);
+        }
+        return t;
+      })()
     : null;
+
+  // Excel'de açılan CSV (Türkçe: noktalı virgül ayraç, virgüllü ondalık, UTF-8 BOM)
+  function excelIndir() {
+    if (!rows || !toplam) return;
+    const csvSayi = (n: number) => n.toFixed(2).replace(".", ",");
+    const basliklar = ["Ay", ...KOLONLAR.map((k) => k.label)];
+    const satirlar = rows.map((r) => [
+      r.ay,
+      ...KOLONLAR.map((k) => csvSayi(r[k.key] as number)),
+    ]);
+    const toplamSatir = [
+      "Yıllık Toplam",
+      ...KOLONLAR.map((k) => (k.noToplam ? "" : csvSayi(toplam[k.key]))),
+    ];
+    const tumu = [basliklar, ...satirlar, toplamSatir];
+    const icerik = "﻿" + tumu.map((s) => s.join(";")).join("\r\n");
+    const blob = new Blob([icerik], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `maas-hesaplama-${P.yil}-${mode === "brutten" ? "brutten-nete" : "netten-brute"}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
 
   const tutarLabel = mode === "brutten" ? "Brüt" : "Net";
 
@@ -381,51 +445,77 @@ export default function MaasHesaplama({
 
       {rows && toplam && (
         <div className="space-y-3">
+          <div className="flex items-center justify-between gap-3 flex-wrap">
+            <p className="text-xs text-gray-500">
+              Tüm kesinti ve istisna kırılımları aşağıdadır. Tabloyu yatay
+              kaydırarak tüm sütunları görebilirsiniz.
+            </p>
+            <button
+              onClick={excelIndir}
+              className="inline-flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-green-700 active:scale-95 transition-all"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m-9 5.25A2.75 2.75 0 005.75 21h12.5A2.75 2.75 0 0021 18.25V9.5a2 2 0 00-.586-1.414l-4.5-4.5A2 2 0 0014.5 3H5.75A2.75 2.75 0 003 5.75v12.5z" />
+              </svg>
+              Excel&apos;e Aktar
+            </button>
+          </div>
+
           <div className="overflow-x-auto rounded-xl border border-gray-200">
-            <table className="w-full text-sm min-w-[720px]">
+            <table className="w-full text-xs min-w-[1500px]">
               <thead>
-                <tr className="bg-gray-50 text-gray-500 text-xs uppercase tracking-wide">
-                  <th className="text-left font-medium px-3 py-2.5">Ay</th>
-                  <th className="text-right font-medium px-3 py-2.5">Brüt</th>
-                  <th className="text-right font-medium px-3 py-2.5">SGK+İşsizlik</th>
-                  <th className="text-right font-medium px-3 py-2.5">Gelir V.</th>
-                  <th className="text-right font-medium px-3 py-2.5">Damga V.</th>
-                  <th className="text-right font-medium px-3 py-2.5 text-blue-700">
-                    Net Ele Geçen
+                <tr className="bg-gray-50 text-gray-500 uppercase tracking-wide">
+                  <th className="text-left font-medium px-2.5 py-2.5 sticky left-0 bg-gray-50 z-10">
+                    Ay
                   </th>
-                  <th className="text-right font-medium px-3 py-2.5">İşveren Maliyeti</th>
+                  {KOLONLAR.map((k) => (
+                    <th
+                      key={k.key}
+                      className={`text-right font-medium px-2.5 py-2.5 whitespace-nowrap ${
+                        k.vurgu ? "text-blue-700" : ""
+                      }`}
+                    >
+                      {k.label}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100">
                 {rows.map((r) => (
                   <tr key={r.ay} className="hover:bg-gray-50/60">
-                    <td className="px-3 py-2 text-gray-700 font-medium">{r.ay}</td>
-                    <td className="px-3 py-2 text-right text-gray-700">{fmt(r.brut)}</td>
-                    <td className="px-3 py-2 text-right text-gray-500">
-                      {fmt(r.sgkKesinti)}
+                    <td className="px-2.5 py-2 text-gray-700 font-medium sticky left-0 bg-white z-10">
+                      {r.ay}
                     </td>
-                    <td className="px-3 py-2 text-right text-gray-500">
-                      {fmt(r.gelirVergisi)}
-                    </td>
-                    <td className="px-3 py-2 text-right text-gray-500">{fmt(r.damga)}</td>
-                    <td className="px-3 py-2 text-right font-semibold text-blue-700">
-                      {fmt(r.net)}
-                    </td>
-                    <td className="px-3 py-2 text-right text-gray-700">
-                      {fmt(r.isverenMaliyeti)}
-                    </td>
+                    {KOLONLAR.map((k) => (
+                      <td
+                        key={k.key}
+                        className={`px-2.5 py-2 text-right whitespace-nowrap ${
+                          k.vurgu
+                            ? "font-semibold text-blue-700"
+                            : "text-gray-600"
+                        }`}
+                      >
+                        {fmt(r[k.key] as number)}
+                      </td>
+                    ))}
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="bg-blue-50/60 font-semibold text-gray-800 border-t-2 border-blue-100">
-                  <td className="px-3 py-2.5">Yıllık Toplam</td>
-                  <td className="px-3 py-2.5 text-right">{fmt(toplam.brut)}</td>
-                  <td className="px-3 py-2.5 text-right">{fmt(toplam.sgkKesinti)}</td>
-                  <td className="px-3 py-2.5 text-right">{fmt(toplam.gelirVergisi)}</td>
-                  <td className="px-3 py-2.5 text-right">{fmt(toplam.damga)}</td>
-                  <td className="px-3 py-2.5 text-right text-blue-700">{fmt(toplam.net)}</td>
-                  <td className="px-3 py-2.5 text-right">{fmt(toplam.isverenMaliyeti)}</td>
+                  <td className="px-2.5 py-2.5 sticky left-0 bg-blue-50 z-10">
+                    Yıllık Toplam
+                  </td>
+                  {KOLONLAR.map((k) => (
+                    <td
+                      key={k.key}
+                      className={`px-2.5 py-2.5 text-right whitespace-nowrap ${
+                        k.vurgu ? "text-blue-700" : ""
+                      }`}
+                    >
+                      {k.noToplam ? "—" : fmt(toplam[k.key])}
+                    </td>
+                  ))}
                 </tr>
               </tfoot>
             </table>
@@ -435,8 +525,9 @@ export default function MaasHesaplama({
             {P.yil} parametreleri: Brüt asgari ücret {fmt(P.asgariBrut)} TL · SGK
             işçi %{(P.sgkIsci * 100).toFixed(0)} + işsizlik %1 · damga %0,759 ·
             gelir vergisi dilimleri %15/20/27/35/40 · SGK tavanı {fmt(P.sgkTavan)}{" "}
-            TL. İşveren maliyeti = Brüt + işveren SGK + işveren işsizlik. Sonuçlar
-            bilgilendirme amaçlıdır; AGİ 2022'de kaldırılmıştır.
+            TL. İşveren maliyeti = Brüt + işveren SGK + işveren işsizlik. Gelir
+            vergisi kümülatif matrah üzerinden hesaplanır. Sonuçlar
+            bilgilendirme amaçlıdır; AGİ 2022&apos;de kaldırılmıştır.
           </p>
         </div>
       )}
