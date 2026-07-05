@@ -12,6 +12,13 @@ export const metadata: Metadata = {
     template: "%s | Ahikurumsal",
   },
   description: "İnsan kaynakları danışmanlığı, blog yazıları ve hesaplama araçları.",
+  icons: {
+    icon: [
+      { url: "/ahikurumsal.jpg", type: "image/jpeg" },
+    ],
+    apple: "/ahikurumsal.jpg",
+    shortcut: "/ahikurumsal.jpg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
