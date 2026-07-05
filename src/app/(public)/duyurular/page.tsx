@@ -2,7 +2,17 @@ import { strapiGetAll } from "@/lib/strapi";
 import DuyurularList from "./DuyurularList";
 
 export const revalidate = 60;
-export const metadata = { title: "Duyurular" };
+export const metadata = {
+  title: "Duyurular",
+  description:
+    "Ahikurumsal güncel duyuruları: mevzuat değişiklikleri, önemli tarihler ve İK ile ilgili bilgilendirmeler.",
+  alternates: { canonical: "https://ahikurumsal.com/duyurular" },
+  openGraph: {
+    title: "Duyurular | Ahikurumsal",
+    description: "Güncel duyurular ve önemli bilgilendirmeler.",
+    url: "https://ahikurumsal.com/duyurular",
+  },
+};
 
 type Duyuru = {
   title: string;

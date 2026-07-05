@@ -3,7 +3,17 @@ import { renderMarkdown } from "@/lib/markdown";
 import Image from "next/image";
 
 export const revalidate = 60;
-export const metadata = { title: "Hakkımda" };
+export const metadata = {
+  title: "Hakkımda",
+  description:
+    "Ahikurumsal hakkında: insan kaynakları alanındaki deneyim, uzmanlık alanları ve danışmanlık yaklaşımı.",
+  alternates: { canonical: "https://ahikurumsal.com/hakkimda" },
+  openGraph: {
+    title: "Hakkımda | Ahikurumsal",
+    description: "İnsan kaynakları uzmanlığı ve danışmanlık yaklaşımı.",
+    url: "https://ahikurumsal.com/hakkimda",
+  },
+};
 
 type HakkimdaFoto = { url: string; alternativeText: string | null };
 

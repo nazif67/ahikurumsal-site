@@ -1,12 +1,14 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { strapiGetAll } from "@/lib/strapi";
+import { strapiGetAll, getStrapiMedia } from "@/lib/strapi";
 import { renderMarkdown } from "@/lib/markdown";
 import { ViewCounter } from "@/components/Views";
 import RelatedPosts from "@/components/RelatedPosts";
 import PaylasButonlari from "@/components/PaylasButonlari";
 
 export const revalidate = 60;
+
+type StrapiMedia = { url?: string; width?: number; height?: number } | null;
 
 type Blog = {
   title: string;
@@ -17,6 +19,7 @@ type Blog = {
   category: string;
   author: string;
   views: number;
+  coverImage?: StrapiMedia;
 };
 
 export async function generateStaticParams() {
@@ -40,10 +43,12 @@ export async function generateMetadata({
     const data = await strapiGetAll<Blog>("/blogs", {
       "filters[slug][$eq]": params.slug,
       fields: "title,excerpt",
+      populate: "coverImage",
     });
     if (data.length > 0) {
       const post = data[0] as Blog & { id: number; documentId: string };
       const url = `https://ahikurumsal.com/blog/${params.slug}`;
+      const kapak = getStrapiMedia(post.coverImage?.url);
       return {
         title: post.title,
         description: post.excerpt || undefined,
@@ -55,6 +60,7 @@ export async function generateMetadata({
           type: "article",
           siteName: "Ahikurumsal",
           locale: "tr_TR",
+          ...(kapak ? { images: [kapak] } : {}),
         },
         twitter: { card: "summary_large_image", title: post.title, description: post.excerpt || undefined },
       };
@@ -97,14 +103,56 @@ export default async function BlogPostPage({
     ...allOthers.filter((b) => !b.category || b.category !== post!.category),
   ].slice(0, 3);
 
+  const url = `https://ahikurumsal.com/blog/${post.slug}`;
+  const kapak = getStrapiMedia(post.coverImage?.url);
+
+  const articleJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: post.title,
+    description: post.excerpt || undefined,
+    image: kapak ? [kapak] : undefined,
+    datePublished: post.date || undefined,
+    dateModified: post.date || undefined,
+    author: post.author
+      ? { "@type": "Person", name: post.author }
+      : { "@type": "Organization", name: "Ahikurumsal" },
+    publisher: {
+      "@type": "Organization",
+      name: "Ahikurumsal",
+      logo: { "@type": "ImageObject", url: "https://ahikurumsal.com/ahikurumsal.jpg" },
+    },
+    mainEntityOfPage: url,
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Ana Sayfa", item: "https://ahikurumsal.com" },
+      { "@type": "ListItem", position: 2, name: "Blog", item: "https://ahikurumsal.com/blog" },
+      { "@type": "ListItem", position: 3, name: post.title, item: url },
+    ],
+  };
+
   return (
     <article className="mx-auto max-w-3xl px-4 py-12">
-      <Link
-        href="/blog"
-        className="text-sm text-brand hover:underline inline-block mb-6"
-      >
-        ← Blog&apos;a dön
-      </Link>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+
+      <nav className="flex flex-wrap items-center gap-1.5 text-sm text-gray-400 mb-6">
+        <Link href="/" className="hover:text-gray-600">Ana Sayfa</Link>
+        <span>/</span>
+        <Link href="/blog" className="hover:text-gray-600">Blog</Link>
+        <span>/</span>
+        <span className="text-gray-600 line-clamp-1">{post.title}</span>
+      </nav>
 
       <div className="flex flex-wrap items-center gap-2 mb-2">
         {post.date && <p className="text-sm text-gray-400">{post.date}</p>}
@@ -128,6 +176,18 @@ export default async function BlogPostPage({
         <p className="mt-4 text-lg text-gray-500 border-l-4 border-brand pl-4 italic">
           {post.excerpt}
         </p>
+      )}
+
+      {kapak && (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={kapak}
+          alt={post.title}
+          width={post.coverImage?.width || undefined}
+          height={post.coverImage?.height || undefined}
+          className="mt-8 w-full rounded-2xl border border-gray-100 object-cover"
+          loading="lazy"
+        />
       )}
 
       <div

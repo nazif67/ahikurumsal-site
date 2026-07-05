@@ -1,7 +1,17 @@
 import { strapiGetSingle } from "@/lib/strapi";
 import ContactForm from "./ContactForm";
 
-export const metadata = { title: "İletişim" };
+export const metadata = {
+  title: "İletişim",
+  description:
+    "Ahikurumsal ile iletişime geçin. İnsan kaynakları danışmanlığı ve iş hukuku soruları için bize ulaşın.",
+  alternates: { canonical: "https://ahikurumsal.com/iletisim" },
+  openGraph: {
+    title: "İletişim | Ahikurumsal",
+    description: "İnsan kaynakları danışmanlığı için bize ulaşın.",
+    url: "https://ahikurumsal.com/iletisim",
+  },
+};
 
 type Hakkimda = {
   email: string;

@@ -5,6 +5,21 @@ import HomeSSSPreview from "@/components/HomeSSSPreview";
 
 export const revalidate = 60;
 
+export const metadata = {
+  title: {
+    absolute: "Ahikurumsal | İnsan Kaynakları Danışmanlığı ve Hesaplama Araçları",
+  },
+  description:
+    "İnsan kaynakları danışmanlığı, iş hukuku ve mevzuat haberleri, İK blog içerikleri ve brütten nete maaş, kıdem & ihbar tazminatı, fazla mesai gibi ücretsiz hesaplama araçları.",
+  alternates: { canonical: "https://ahikurumsal.com" },
+  openGraph: {
+    title: "Ahikurumsal | İnsan Kaynakları Danışmanlığı ve Hesaplama Araçları",
+    description:
+      "İK danışmanlığı, iş hukuku içerikleri ve ücretsiz hesaplama araçları tek adreste.",
+    url: "https://ahikurumsal.com",
+  },
+};
+
 const VARSAYILAN_TAVAN = 47228.43;
 
 type Blog = { title: string; slug: string; excerpt: string; date: string };

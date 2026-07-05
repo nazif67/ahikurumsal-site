@@ -1,7 +1,17 @@
 import { strapiGetAll, getStrapiUrl } from "@/lib/strapi";
 
 export const revalidate = 60;
-export const metadata = { title: "Hazır Şablonlar" };
+export const metadata = {
+  title: "Hazır İK Şablonları",
+  description:
+    "İnsan kaynakları ve iş hukuku için hazır şablonlar: iş sözleşmesi, ihtarname, tutanak ve daha fazlası. İndirip kullanabilirsiniz.",
+  alternates: { canonical: "https://ahikurumsal.com/hazir-sablonlar" },
+  openGraph: {
+    title: "Hazır İK Şablonları | Ahikurumsal",
+    description: "İş sözleşmesi, ihtarname ve daha fazlası — hazır İK şablonları.",
+    url: "https://ahikurumsal.com/hazir-sablonlar",
+  },
+};
 
 type Sablon = {
   title: string;

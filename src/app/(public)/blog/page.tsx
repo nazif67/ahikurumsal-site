@@ -2,7 +2,18 @@ import { strapiGetAll } from "@/lib/strapi";
 import BlogList from "./BlogList";
 
 export const revalidate = 60;
-export const metadata = { title: "Blog" };
+export const metadata = {
+  title: "Blog",
+  description:
+    "İnsan kaynakları, iş hukuku, özlük işleri ve bordro konularında güncel blog yazıları, rehberler ve pratik bilgiler.",
+  alternates: { canonical: "https://ahikurumsal.com/blog" },
+  openGraph: {
+    title: "İK Blog | Ahikurumsal",
+    description:
+      "İnsan kaynakları ve iş hukuku üzerine güncel yazılar ve rehberler.",
+    url: "https://ahikurumsal.com/blog",
+  },
+};
 
 type Blog = {
   title: string;
