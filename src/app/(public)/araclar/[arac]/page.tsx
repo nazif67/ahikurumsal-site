@@ -3,8 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import HesaplamaAraclari from "@/components/HesaplamaAraclari";
 import AracKartlari from "@/components/AracKartlari";
-import { getAraclarVeri } from "@/lib/araclarVeri";
-import { ARACLAR, aracBul } from "@/lib/araclarData";
+import { getAraclarVeri, getArac } from "@/lib/araclarVeri";
+import { ARACLAR } from "@/lib/araclarData";
 
 export const revalidate = 3600;
 
@@ -14,12 +14,12 @@ export function generateStaticParams() {
   return ARACLAR.map((a) => ({ arac: a.slug }));
 }
 
-export function generateMetadata({
+export async function generateMetadata({
   params,
 }: {
   params: { arac: string };
-}): Metadata {
-  const arac = aracBul(params.arac);
+}): Promise<Metadata> {
+  const arac = await getArac(params.arac);
   if (!arac) return { title: "Araç bulunamadı" };
   const url = `${BASE}/araclar/${arac.slug}`;
   return {
@@ -43,7 +43,7 @@ export default async function AracDetayPage({
 }: {
   params: { arac: string };
 }) {
-  const arac = aracBul(params.arac);
+  const arac = await getArac(params.arac);
   if (!arac) notFound();
 
   const { kidemTavani, tavanTarihi, maasParams } = await getAraclarVeri();
@@ -91,9 +91,16 @@ export default async function AracDetayPage({
         </nav>
 
         <h1 className="text-3xl font-bold text-gray-900">{arac.h1}</h1>
-        <div className="mt-4 text-gray-600 leading-relaxed space-y-3 prose-content">
-          {arac.icerik}
-        </div>
+        {arac.icerikHtml ? (
+          <div
+            className="mt-4 text-gray-600 leading-relaxed prose-content"
+            dangerouslySetInnerHTML={{ __html: arac.icerikHtml }}
+          />
+        ) : (
+          <div className="mt-4 text-gray-600 leading-relaxed space-y-3 prose-content">
+            {arac.icerik}
+          </div>
+        )}
 
         <div className="flex gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 my-6 text-sm text-amber-800">
           <span className="text-amber-500 text-base leading-snug flex-shrink-0">⚠</span>
