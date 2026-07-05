@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { strapiGetAll, strapiGetSingle } from "@/lib/strapi";
 import AraclarDemo from "@/components/AraclarDemo";
+import HomeSSSPreview from "@/components/HomeSSSPreview";
 
 export const revalidate = 60;
 
@@ -21,6 +22,13 @@ type Haber = {
   excerpt: string;
   date: string;
   category: string;
+};
+
+type SSSItem = {
+  id: number;
+  question: string;
+  answer: string;
+  category?: string;
 };
 
 const UZMANLIK = [
@@ -97,7 +105,7 @@ const HERO_FEATURES = [
 ];
 
 export default async function HomePage() {
-  const [latestPosts, latestDuyurular, latestHaberler, kidemTavaniData] = await Promise.all([
+  const [latestPosts, latestDuyurular, latestHaberler, kidemTavaniData, sssItems] = await Promise.all([
     strapiGetAll<Blog>("/blogs", {
       "pagination[pageSize]": 3,
       sort: "date:desc",
@@ -114,6 +122,11 @@ export default async function HomePage() {
       fields: "title,slug,excerpt,date,category",
     }).catch(() => []),
     strapiGetSingle<{ tutar: number }>("/kidem-tavan").catch(() => null),
+    strapiGetAll<SSSItem>("/sss-items", {
+      "pagination[pageSize]": 6,
+      sort: "order:asc",
+      fields: "question,answer,category",
+    }).catch(() => []),
   ]);
 
   const kidemTavani = kidemTavaniData?.tutar || VARSAYILAN_TAVAN;
@@ -398,6 +411,18 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* SSS Önizleme */}
+      {sssItems.length > 0 && (
+        <HomeSSSPreview
+          items={sssItems.map((i) => ({
+            id: i.id,
+            question: i.question,
+            answer: i.answer,
+            category: i.category,
+          }))}
+        />
+      )}
 
       {/* Hakkımda CTA */}
       <section className="bg-gradient-to-br from-brand to-brand-dark py-20">

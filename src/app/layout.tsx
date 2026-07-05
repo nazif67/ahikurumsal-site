@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import SoruBubble from "@/components/SoruBubble";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -26,6 +27,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="tr">
       <body className={`${inter.className} flex min-h-screen flex-col bg-gray-50`}>
         {children}
+        <SoruBubble />
         <Script
           strategy="afterInteractive"
           src="https://www.googletagmanager.com/gtag/js?id=G-XKXYLQSWDE"
