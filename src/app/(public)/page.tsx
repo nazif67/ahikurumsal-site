@@ -2,6 +2,7 @@ import Link from "next/link";
 import { strapiGetAll, strapiGetSingle } from "@/lib/strapi";
 import AraclarDemo from "@/components/AraclarDemo";
 import HomeSSSPreview from "@/components/HomeSSSPreview";
+import IKYazilimTanitim from "@/components/IKYazilimTanitim";
 
 export const revalidate = 60;
 
@@ -212,6 +213,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Ücretsiz İK & PDKS Yazılımı Tanıtımı */}
+      <IKYazilimTanitim />
 
       {/* Haberlerden Kesitler */}
       {latestHaberler.length > 0 && (
