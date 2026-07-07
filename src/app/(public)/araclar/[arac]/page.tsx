@@ -91,16 +91,6 @@ export default async function AracDetayPage({
         </nav>
 
         <h1 className="text-3xl font-bold text-gray-900">{arac.h1}</h1>
-        {arac.icerikHtml ? (
-          <div
-            className="mt-4 text-gray-600 leading-relaxed prose-content"
-            dangerouslySetInnerHTML={{ __html: arac.icerikHtml }}
-          />
-        ) : (
-          <div className="mt-4 text-gray-600 leading-relaxed space-y-3 prose-content">
-            {arac.icerik}
-          </div>
-        )}
 
         <div className="flex gap-3 bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 my-6 text-sm text-amber-800">
           <span className="text-amber-500 text-base leading-snug flex-shrink-0">⚠</span>
@@ -117,6 +107,20 @@ export default async function AracDetayPage({
         maasParams={maasParams}
         soloArac={arac.tabId}
       />
+
+      {/* Açıklama — SEO içeriği hesaplama aracının altında gösterilir */}
+      <section className="max-w-3xl mt-14">
+        {arac.icerikHtml ? (
+          <div
+            className="text-gray-600 leading-relaxed prose-content"
+            dangerouslySetInnerHTML={{ __html: arac.icerikHtml }}
+          />
+        ) : (
+          <div className="text-gray-600 leading-relaxed space-y-3 prose-content">
+            {arac.icerik}
+          </div>
+        )}
+      </section>
 
       {/* SSS */}
       {arac.sss.length > 0 && (
