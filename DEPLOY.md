@@ -22,7 +22,7 @@ sudo npm install -g pm2
 
 ```bash
 cd /var/www
-git clone https://github.com/ahikariyer-ik/front-main.git kisisel-site
+git clone https://github.com/nazif67/ahikurumsal-site.git kisisel-site
 cd kisisel-site
 npm install
 npm run build

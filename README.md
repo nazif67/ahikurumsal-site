@@ -47,7 +47,7 @@ git init
 git add .
 git commit -m "İlk sürüm: ana sayfa + blog"
 git branch -M main
-git remote add origin https://github.com/ahikariyer-ik/front-main.git
+git remote add origin https://github.com/nazif67/ahikurumsal-site.git
 git push -u origin main
 ```
 

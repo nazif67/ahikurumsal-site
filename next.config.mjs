@@ -8,18 +8,6 @@ const nextConfig = {
   },
   async redirects() {
     return [
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "ahikariyer.com" }],
-        destination: "https://ahikurumsal.com/:path*",
-        permanent: true,
-      },
-      {
-        source: "/:path*",
-        has: [{ type: "host", value: "www.ahikariyer.com" }],
-        destination: "https://ahikurumsal.com/:path*",
-        permanent: true,
-      },
       { source: "/pratik-bilgiler", destination: "/haberler", permanent: true },
       { source: "/pratik-bilgiler/:slug", destination: "/haberler/:slug", permanent: true },
     ];
