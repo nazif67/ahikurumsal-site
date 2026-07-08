@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import SoruBubble from "@/components/SoruBubble";
+import CookieBanner from "@/components/CookieBanner";
 
 const inter = Inter({ subsets: ["latin"], display: "swap" });
 
@@ -66,22 +66,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         {children}
         <SoruBubble />
-        <Script
-          strategy="afterInteractive"
-          src="https://www.googletagmanager.com/gtag/js?id=G-XKXYLQSWDE"
-        />
-        <Script
-          id="google-analytics"
-          strategy="afterInteractive"
-          dangerouslySetInnerHTML={{
-            __html: `
-              window.dataLayer = window.dataLayer || [];
-              function gtag(){dataLayer.push(arguments);}
-              gtag('js', new Date());
-              gtag('config', 'G-XKXYLQSWDE');
-            `,
-          }}
-        />
+        {/* Google Analytics artık koşulsuz yüklenmiyor; CookieBanner içinde
+            yalnızca kullanıcı açık rıza verdiğinde çalışır (KVKK/ePrivacy). */}
+        <CookieBanner />
       </body>
     </html>
   );

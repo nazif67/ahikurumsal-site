@@ -42,7 +42,7 @@ export default function Footer() {
           </div>
 
           <div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-4">İletişim</p>
+            <p className="text-xs font-semibold uppercase tracking-widest text-blue-300 mb-4">İletişim & Yasal</p>
             <ul className="space-y-2.5 text-sm text-blue-100">
               <li>
                 <Link href="/iletisim" className="hover:text-white transition-colors">
@@ -52,6 +52,21 @@ export default function Footer() {
               <li>
                 <Link href="/hakkimda" className="hover:text-white transition-colors">
                   Hakkımda
+                </Link>
+              </li>
+              <li>
+                <Link href="/kvkk-aydinlatma-metni" className="hover:text-white transition-colors">
+                  KVKK Aydınlatma Metni
+                </Link>
+              </li>
+              <li>
+                <Link href="/gizlilik-politikasi" className="hover:text-white transition-colors">
+                  Gizlilik Politikası
+                </Link>
+              </li>
+              <li>
+                <Link href="/cerez-politikasi" className="hover:text-white transition-colors">
+                  Çerez Politikası
                 </Link>
               </li>
             </ul>

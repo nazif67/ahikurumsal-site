@@ -100,6 +100,24 @@ export default function ContactForm() {
         />
       </div>
 
+      <label htmlFor="kvkkOnay" className="flex items-start gap-2.5 text-sm text-gray-600">
+        <input
+          id="kvkkOnay"
+          name="kvkkOnay"
+          type="checkbox"
+          required
+          className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-gray-300 text-brand focus:ring-brand/30"
+        />
+        <span>
+          Kişisel verilerimin,{" "}
+          <a href="/kvkk-aydinlatma-metni" target="_blank" rel="noopener noreferrer" className="text-brand underline hover:opacity-80">
+            KVKK Aydınlatma Metni
+          </a>{" "}
+          kapsamında iletişim talebimin karşılanması amacıyla işlenmesini kabul
+          ediyorum. <span className="text-red-500">*</span>
+        </span>
+      </label>
+
       <SubmitButton />
     </form>
   );

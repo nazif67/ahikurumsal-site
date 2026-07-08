@@ -15,9 +15,18 @@ export async function iletisimGonder(
   const email = (formData.get("email") as string)?.trim();
   const konu = (formData.get("konu") as string)?.trim();
   const mesaj = (formData.get("mesaj") as string)?.trim();
+  const kvkkOnay = formData.get("kvkkOnay");
 
   if (!ad || !email || !konu || !mesaj) {
     return { status: "error", message: "Lütfen tüm alanları doldurun." };
+  }
+
+  // KVKK açık rıza olmadan kişisel veri işlenmemeli
+  if (!kvkkOnay) {
+    return {
+      status: "error",
+      message: "Devam etmek için Aydınlatma Metni'ni onaylamanız gerekmektedir.",
+    };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
