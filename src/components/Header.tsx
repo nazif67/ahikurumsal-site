@@ -37,9 +37,9 @@ export default function Header() {
           <Image
             src="/ahikurumsal.jpg"
             alt="Ahikurumsal"
-            width={72}
-            height={72}
-            className="rounded-xl object-contain"
+            width={176}
+            height={56}
+            className="h-10 w-auto sm:h-14 rounded-lg object-contain"
             priority
           />
         </Link>

@@ -19,9 +19,9 @@ export default function Footer() {
             <Image
               src="/ahikurumsal.jpg"
               alt="Ahikurumsal"
-              width={64}
-              height={64}
-              className="rounded-xl object-contain"
+              width={151}
+              height={48}
+              className="h-12 w-auto rounded-lg object-contain"
             />
             <p className="mt-4 text-sm text-blue-200 leading-relaxed">
               İnsan kaynakları, iş hukuku, bordro ve SGK alanlarında uzman danışmanlık hizmetleri.
