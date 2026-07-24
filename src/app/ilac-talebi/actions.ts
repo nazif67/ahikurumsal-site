@@ -13,9 +13,11 @@ export async function ilacTalebiGonder(
 ): Promise<FormState> {
   const adSoyad = (formData.get("adSoyad") as string)?.trim();
   const ilaclar = (formData.get("ilaclar") as string)?.trim();
+  const mgBilgisi = (formData.get("mgBilgisi") as string)?.trim();
+  const hekimRaporu = formData.get("hekimRaporu") as string;
   const kvkkOnay = formData.get("kvkkOnay");
 
-  if (!adSoyad || !ilaclar) {
+  if (!adSoyad || !ilaclar || !mgBilgisi || !hekimRaporu) {
     return { status: "error", message: "Lütfen tüm alanları doldurun." };
   }
 
@@ -29,7 +31,7 @@ export async function ilacTalebiGonder(
   }
 
   try {
-    await strapiPost("/ilac-talepleri", { adSoyad, ilaclar });
+    await strapiPost("/ilac-talepleri", { adSoyad, ilaclar, mgBilgisi, hekimRaporu });
     return { status: "success" };
   } catch {
     return {
