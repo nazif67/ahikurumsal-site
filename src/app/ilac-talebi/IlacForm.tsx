@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { ilacTalebiGonder, FormState } from "./actions";
@@ -43,12 +42,6 @@ export default function IlacForm() {
         <p className="mt-2 text-sm text-green-700">
           Doktorumuza bildirim gönderildi.
         </p>
-        <Link
-          href="/"
-          className="mt-6 inline-block rounded-lg border border-gray-300 px-5 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50"
-        >
-          Ana Menüye Dön
-        </Link>
       </div>
     );
   }
@@ -165,13 +158,6 @@ export default function IlacForm() {
       </label>
 
       <SubmitButton />
-
-      <Link
-        href="/"
-        className="block text-center text-sm text-gray-500 hover:text-gray-700"
-      >
-        Ana Menüye Dön
-      </Link>
     </form>
   );
 }
