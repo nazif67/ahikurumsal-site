@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRef, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import { ilacTalebiGonder, FormState } from "./actions";
 
@@ -21,6 +22,16 @@ function SubmitButton() {
 
 export default function IlacForm() {
   const [state, action] = useFormState(ilacTalebiGonder, initialState);
+  const [satirlar, setSatirlar] = useState<number[]>([0]);
+  const sonrakiId = useRef(1);
+
+  const satirEkle = () => {
+    setSatirlar((mevcut) => [...mevcut, sonrakiId.current++]);
+  };
+
+  const satirSil = (id: number) => {
+    setSatirlar((mevcut) => mevcut.filter((s) => s !== id));
+  };
 
   if (state.status === "success") {
     return (
@@ -65,31 +76,46 @@ export default function IlacForm() {
       </div>
 
       <div>
-        <label htmlFor="ilaclar" className="block text-sm font-medium text-gray-700 mb-1">
+        <span className="block text-sm font-medium text-gray-700 mb-1">
           İlaçlar <span className="text-red-500">*</span>
-        </label>
-        <textarea
-          id="ilaclar"
-          name="ilaclar"
-          required
-          rows={5}
-          placeholder="Kullanmanız gereken ilaçların isimlerini yazın..."
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20 resize-none"
-        />
-      </div>
-
-      <div>
-        <label htmlFor="mgBilgisi" className="block text-sm font-medium text-gray-700 mb-1">
-          Kaç mg olacağı <span className="text-red-500">*</span>
-        </label>
-        <input
-          id="mgBilgisi"
-          name="mgBilgisi"
-          type="text"
-          required
-          placeholder="Örn: 500 mg"
-          className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
-        />
+        </span>
+        <div className="space-y-2">
+          {satirlar.map((id, index) => (
+            <div key={id} className="flex gap-2">
+              <input
+                name="ilacAdi"
+                type="text"
+                required
+                placeholder="İlaç adı"
+                className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              />
+              <input
+                name="mg"
+                type="text"
+                required
+                placeholder="Mg (örn: 500 mg)"
+                className="w-32 rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:border-brand focus:outline-none focus:ring-2 focus:ring-brand/20"
+              />
+              {satirlar.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => satirSil(id)}
+                  aria-label={`${index + 1}. ilacı sil`}
+                  className="flex-shrink-0 rounded-lg border border-gray-300 px-3 text-sm text-gray-500 hover:bg-gray-50"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={satirEkle}
+          className="mt-2 text-sm font-medium text-brand hover:opacity-80"
+        >
+          + İlaç Ekle
+        </button>
       </div>
 
       <div>

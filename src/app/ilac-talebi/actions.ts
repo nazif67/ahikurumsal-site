@@ -12,12 +12,26 @@ export async function ilacTalebiGonder(
   formData: FormData
 ): Promise<FormState> {
   const adSoyad = (formData.get("adSoyad") as string)?.trim();
-  const ilaclar = (formData.get("ilaclar") as string)?.trim();
-  const mgBilgisi = (formData.get("mgBilgisi") as string)?.trim();
+  const ilacAdlari = formData.getAll("ilacAdi").map((v) => (v as string).trim());
+  const mgDegerleri = formData.getAll("mg").map((v) => (v as string).trim());
   const hekimRaporu = formData.get("hekimRaporu") as string;
   const kvkkOnay = formData.get("kvkkOnay");
 
-  if (!adSoyad || !ilaclar || !mgBilgisi || !hekimRaporu) {
+  const ilaclar: { ilacAdi: string; mg: string }[] = [];
+  for (let i = 0; i < ilacAdlari.length; i++) {
+    const ilacAdi = ilacAdlari[i];
+    const mg = mgDegerleri[i] ?? "";
+    if (!ilacAdi && !mg) continue;
+    if (!ilacAdi || !mg) {
+      return {
+        status: "error",
+        message: "Her ilaç için hem ad hem mg bilgisini giriniz.",
+      };
+    }
+    ilaclar.push({ ilacAdi, mg });
+  }
+
+  if (!adSoyad || ilaclar.length === 0 || !hekimRaporu) {
     return { status: "error", message: "Lütfen tüm alanları doldurun." };
   }
 
@@ -31,7 +45,7 @@ export async function ilacTalebiGonder(
   }
 
   try {
-    await strapiPost("/ilac-talepleri", { adSoyad, ilaclar, mgBilgisi, hekimRaporu });
+    await strapiPost("/ilac-talepleri", { adSoyad, ilaclar, hekimRaporu });
     return { status: "success" };
   } catch {
     return {
